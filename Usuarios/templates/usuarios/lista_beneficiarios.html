@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+
+        <h2>Lista dos 50 últimos benefícios entregues</h2>
+        <form class="pure-form pure-form-stacked">
+            {% csrf_token %}
+             <div class="pure-controls">
+                 <a href="{% url 'usuarios:busca_beneficiarios' %}" class="pure-button pure-button-hope">Voltar</a>
+             </div>
+
+        </form>
+        <br><br>
+        <table border="1">
+
+            {% if beneficiarios %}
+            <tr>
+               <th>Ord.</th>
+                <th>CPF</th>
+                <th>Nome</th>
+                <th>Benefício</th>
+                <th>Data de Entrega</th>
+            </tr>
+
+            {% for beneficiario in beneficiarios %}
+        <tr>
+            <td> </td>
+
+            <td>{%for usuario in usuarios %}
+                    {% if usuario.pk == beneficiario.nome.pk %}
+                        {{ usuario.CPF }}
+                    {% endif %}
+            {% endfor %}</td>
+            <td><a href="#">{{ beneficiario.nome }}</a></td>
+            <td>{{ beneficiario.tipo_beneficio}}</td>
+            <td>{{ beneficiario.data_beneficio }}</td>
+        </tr>
+            {% endfor %}
+        {% endif %}
+        </table>
+    </div>
+</div>
+{% endblock %}

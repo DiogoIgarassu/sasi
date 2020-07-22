@@ -1,0 +1,40 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+
+        <h2>Informe os dados do Usuário</h2>
+        <form class="pure-form pure-form-stacked" method="post">
+            {% csrf_token %}
+            <fieldset>
+                {{ form.non_field_errors }}
+
+                {% for field in form %}
+                <div class="pure-control-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+
+                <div class="pure-controls">
+
+                {% if beneficiario %}
+                    <button type="submit" class="pure-button pure-button-primary">Salvar Alterações</button>
+                {% else %}
+                    <button type="submit" class="pure-button pure-button-primary">+ Incluir</button>
+			    {% endif %}
+
+                     <a href="{% url 'usuarios:busca_beneficiarios' %}" class="pure-button pure-button-hope">Voltar</a>
+                </div>
+            </fieldset>
+
+        </form>
+
+    </div>
+</div>
+{% endblock %}

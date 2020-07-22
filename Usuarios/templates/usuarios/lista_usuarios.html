@@ -1,0 +1,30 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+
+        <h2>Lista ds 50 últimos Usuários Cadastrados</h2>
+        <form class="pure-form pure-form-stacked">
+            {% csrf_token %}
+             <div class="pure-controls">
+                 <a href="{% url 'usuarios:index' %}" class="pure-button pure-button-hope">Voltar</a>
+                 <a href="{% url 'usuarios:cadastrar' %}" class="pure-button pure-button-primary">Cadastrar Novo</a>
+             </div>
+
+        </form>
+
+        {% if usuarios %}
+        <ul>
+            {% for usuario in usuarios %}
+                <li><a href="{% url 'usuarios:url_update' usuario.id %}"> {{ usuario.CPF }} - {{ usuario.nome }} - {{ usuario.bairro }} </a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

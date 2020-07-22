@@ -1,0 +1,67 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+
+        <h2>Busque pelo CPF do Usuário</h2>
+        <form class="pure-form pure-form-stacked">
+            {% csrf_token %}
+            <label>Digite o CPF:</label>
+			<input type="text" name="busca_cpf" maxlength="11" autofocus  placeholder="CPF">
+<br>
+             <div class="pure-controls">
+                 <a href="{% url 'usuarios:busca_beneficiarios' %}"><button type="submit" class="pure-button pure-button-hope">Buscar</button></a>
+                 <a href="{% url 'usuarios:all_beneficiarios' %}" class="pure-button pure-button-hope">Ver Últimas Inclusões</a>
+             </div>
+
+        </form>
+        <br>
+
+        {% if mensagem %}
+
+        <br><p>{{ mensagem }}</p>
+       <a href="{% url 'usuarios:cadastrar' %}" class="pure-button pure-button-primary">Cadastrar Usuário</a>
+
+        {% endif %}
+<br>
+
+        {% if usuarios %}
+
+        <table border="2px" style="border-color: black" >
+            <tr>
+            {% for usuario in usuarios %}
+
+            {% if usuario.status == "OFF" %}
+                <a href="{% url 'usuarios:url_update' usuario.id %}" class="pure-button pure-button-danger">Usuário Inativo, Atualize!</a><br>
+            {% endif %}
+
+            <td bgcolor="grey" style="color:#000000;font-weight: bold; ">  CPF: <br>{{ usuario.CPF }} </td>
+                <td bgcolor="grey" style="color:#000000;font-weight: bold;">  NOME:<br>{{ usuario.nome }}</td>
+                <td ><a href="{% url 'usuarios:incluir_beneficio' usuario.CPF %}" class="pure-button pure-button-primary">+ Cesta Básica</a></td>
+                {% endfor %}
+        {% endif %}
+        </tr>
+      <br>
+        {% if beneficiarios %}
+
+            {% for beneficio in beneficiarios %}
+            <tr><td><a href="{% url 'usuarios:update_beneficiario' beneficio.pk %}"><i class="fa fa-eye"></i> {{ beneficio.tipo_beneficio}} </a></td>
+                <td align="center">{{ beneficio.data_beneficio }} </td></tr>
+            {% endfor %}
+
+            </table>
+        {% else %}
+            {% if usuarios %}
+                <tr><td>Nenhum Benefício</td>
+                    <td align="center">Nehuma data</td></tr>
+                </table>
+            {% endif %}
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+
+        <h2>Informe os dados do Usuário</h2>
+        <form class="pure-form pure-form-stacked" method="post">
+            {% csrf_token %}
+            <fieldset>
+                {{ form.non_field_errors }}
+
+                {% for field in form %}
+                <div class="pure-control-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+
+                <div class="pure-controls">
+
+                {%if usuario %}
+                    <button type="submit" class="pure-button pure-button-primary">Salvar Alterações</button>
+			        <a href="{% url 'usuarios:url_delete' usuario.id %}" class="pure-button pure-button-danger">Excluir</a>
+                {% else %}
+                    <button type="submit" class="pure-button pure-button-primary">Cadastrar</button>
+			    {% endif %}
+
+                     <a href="{% url 'usuarios:index' %}" class="pure-button pure-button-hope">Voltar</a>
+                </div>
+            </fieldset>
+
+        </form>
+
+    </div>
+</div>
+{% endblock %}

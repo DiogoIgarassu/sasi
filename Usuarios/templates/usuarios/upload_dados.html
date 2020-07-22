@@ -1,0 +1,30 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+
+        <h2>Atenção: Cuidado com os dados!!</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <div><strong>{{message|safe}}</strong></div>
+            {% endfor %}
+        {% else %}
+        <form method="post" class="pure-form pure-form-stacked" enctype="multipart/form-data">
+            {% csrf_token %}
+
+                <label>Upload o arquivo</label>
+                <input type="file" name="file">
+
+            <div class="pure-controls">
+                <button type="submit" class="pure-button pure-button-danger">Enviar</button>
+                <a href="{% url 'core:home' %}" class="pure-button pure-button-primary">Voltar</a>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
