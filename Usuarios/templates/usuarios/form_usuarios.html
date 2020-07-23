@@ -18,6 +18,7 @@
                     {{ field.label_tag }}
                     {{ field }}
                     {{ field.errors }}
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
                 </div>
                 {% endfor %}
 

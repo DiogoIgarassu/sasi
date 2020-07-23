@@ -26,7 +26,7 @@
         {% if usuarios %}
         <ul>
             {% for usuario in usuarios %}
-                <li><a href="{% url 'usuarios:url_update' usuario.id %}"> {{ usuario.CPF }} - {{ usuario.nome }} </a></li>
+                <li><a href="{% url 'usuarios:usuarios_details' usuario.id %}"> {{ usuario.CPF }} - {{ usuario.nome }} - {{ enderenco }} </a></li>
             {% endfor %}
         </ul>
         {% endif %}

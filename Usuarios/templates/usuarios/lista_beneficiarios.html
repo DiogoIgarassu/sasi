@@ -2,7 +2,15 @@
 {% load static %}
 
 {% block content %}
+<script>
+    var table = document.getElementsByTagName('table')[0],
+        rows = table.getElementsByTagName('tr'),
+        text = 'textContent' in document ? 'textContent' : 'innerText';
 
+    for (var i = 0, len = rows.length; i < len; i++) {
+      rows[i].children[0][text] = i + ': ' + rows[i].children[0][text];
+}
+</script>
 <div class="pure-g-r content-ribbon">
 
     <div class="pure-u-1">
@@ -20,7 +28,6 @@
 
             {% if beneficiarios %}
             <tr>
-               <th>Ord.</th>
                 <th>CPF</th>
                 <th>Nome</th>
                 <th>Benefício</th>
@@ -29,14 +36,12 @@
 
             {% for beneficiario in beneficiarios %}
         <tr>
-            <td> </td>
-
             <td>{%for usuario in usuarios %}
                     {% if usuario.pk == beneficiario.nome.pk %}
                         {{ usuario.CPF }}
                     {% endif %}
             {% endfor %}</td>
-            <td><a href="#">{{ beneficiario.nome }}</a></td>
+            <td><a href="#">{{ beneficiario.nome|linenumbers  }}</a></td>
             <td>{{ beneficiario.tipo_beneficio}}</td>
             <td>{{ beneficiario.data_beneficio }}</td>
         </tr>

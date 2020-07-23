@@ -15,6 +15,11 @@ a {
 }
 .l-box {
     padding: 1em;
+    width: 20%
+    height: 20%
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 1.25rem;
 }
 .header {
     margin: 0 0;

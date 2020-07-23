@@ -9,7 +9,7 @@ class Usuario(models.Model):
     created_at = models.DateTimeField('Cadastrado em', auto_now_add=True)
     update_at = models.DateTimeField('Atualizado em', auto_now=True)
     CPF = models.CharField(max_length=11, unique=True)
-    NIS = models.CharField(max_length=11, blank=True, unique=True)
+    NIS = models.CharField(max_length=11, blank=True)
     RG = models.CharField(max_length=11, blank=True)
     nome = models.CharField(max_length=80)
     nascimento = models.DateField(null=True, blank=True)
@@ -28,7 +28,7 @@ class Usuario(models.Model):
         ('OFF', 'Inativo'),
     )
     image = models.ImageField(
-        upload_to='Usuarios/fotos', verbose_name='Foto',
+        upload_to='usuarios/images', verbose_name='Foto',
         null=True, blank=True
     )
     status = models.CharField(max_length=3, choices=STATUS)
@@ -69,6 +69,7 @@ class Beneficiario(models.Model):
     tipo_beneficio = models.ForeignKey(Beneficio, on_delete=CASCADE, related_name='tipo_beneficio')
     qtd_familia = models.CharField(max_length=3, blank=True)
     renda = models.CharField(max_length=7, blank=True)
+    equipamento = models.CharField(max_length=20, blank=True)
     parecer = models.TextField(null=True, blank=True)
     assistente_social = models.CharField(max_length=50, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,

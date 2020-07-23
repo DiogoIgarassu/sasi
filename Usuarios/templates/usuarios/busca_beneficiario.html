@@ -36,12 +36,12 @@
             {% for usuario in usuarios %}
 
             {% if usuario.status == "OFF" %}
-                <a href="{% url 'usuarios:url_update' usuario.id %}" class="pure-button pure-button-danger">Usuário Inativo, Atualize!</a><br>
+                <a href="{% url 'usuarios:url_update' usuario.id %}?next={{ request.path|urlencode }}" class="pure-button pure-button-danger">Usuário Inativo, Atualize!</a><br>
             {% endif %}
 
             <td bgcolor="grey" style="color:#000000;font-weight: bold; ">  CPF: <br>{{ usuario.CPF }} </td>
                 <td bgcolor="grey" style="color:#000000;font-weight: bold;">  NOME:<br>{{ usuario.nome }}</td>
-                <td ><a href="{% url 'usuarios:incluir_beneficio' usuario.CPF %}" class="pure-button pure-button-primary">+ Cesta Básica</a></td>
+                <td ><a href="{% url 'usuarios:incluir_beneficio' usuario.CPF %}" class="pure-button pure-button-primary">Conceder Cesta Básica</a></td>
                 {% endfor %}
         {% endif %}
         </tr>

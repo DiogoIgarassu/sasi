@@ -14,5 +14,5 @@ class user_form(forms.ModelForm):
 class beneficiario_form(forms.ModelForm):
     class Meta:
         model = Beneficiario
-        fields = ['qtd_familia', 'renda', 'parecer', 'assistente_social', 'data_beneficio', 'image']
+        fields = ['qtd_familia', 'renda', 'parecer', 'assistente_social', 'equipamento', 'data_beneficio', 'image']
 

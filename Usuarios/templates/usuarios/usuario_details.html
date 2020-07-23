@@ -1,0 +1,68 @@
+{% extends "core/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<style type="text/css">
+body, html{
+  height: 100%;
+}
+
+.menu{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: left;
+  justify-content: left;
+ }
+#div1{
+    left:10px;
+    width:200px;
+    height:200px;
+    margin: 10px 10px 10px 10px;
+     background: #02a6eb;
+}
+#div2{
+    float: left;
+    left:20px;
+    width:80%
+    height:300px;
+    margin: 10px 10px 10px 10px;
+}
+</style>
+
+<div class="splash">
+    <div class="pure-g-r">
+        <div class="pure-u-1">
+            <div class="l-box splash-text">
+                <h2 class="splash-head">
+                    {{ usuario }}
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="menu">
+        <div class="l-box" id="div1" align="left">
+            {% if usuario.image %}
+            <img src="{{ usuario.image.url }}" alt="" style="width:100%;"/>
+            {% else %}
+            <img src="{% static 'img/user_default.png' %}" alt="" style="width:100%;"/>
+            {% endif %}
+          </div>
+        <div id="div2" align="left">
+             <b>CPF:</b> {{ usuario.CPF }} <b>NIS:</b> {{ usuario.NIS }} <br>
+            <b>Nascimento:</b> {{ usuario.nascimento }}  <b>Nome da Mãe:</b> {{ usuario.nome_mae }} <br>
+            <b>Endereço:</b> {{ usuario.endereco }}  <b>Bairro:</b> {{ usuario.bairro }} <b>Cidade:</b> {{ usuario.cidade }} <br>
+            <b>Ponto de Referência:</b> {{ usuario.referencia }}  <b>Telefone:</b> {{ usuario.telefone1 }} <b>Telefone:</b> {{ usuario.telefone2 }} <br>
+            <b>Observações:</b> {{ usuario.observacoes }}  <br>
+            <b>Status:</b> {{ usuario.status }} <b>Última Atualização:</b> {{ usuario.update_at }} <b>feita por</b> {{ usuario.user }}
+        </div>
+    </div>
+            <p>
+                <a href="{% url 'usuarios:url_update' usuario.id %}" title="" class="pure-button-danger">Atualize o Cadastro</a>
+                <a href="{% url 'usuarios:index' %}" class="pure-button pure-button-hope">Voltar</a>
+            </p>
+
+{% endblock %}

@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import io
 import csv
+from django.http import HttpResponseRedirect
 
 @login_required
 def buscar_usuarios(request):
@@ -64,6 +65,7 @@ def all_beneficiarios(request):
     usuarios = Usuario.objects.all()
     dados['beneficiarios'] = beneficiarios
     dados['usuarios'] = usuarios
+    dados['cont'] = 0
 
     return render(request, 'usuarios/lista_beneficiarios.html', dados)
 
@@ -112,10 +114,13 @@ def up_usuario(request, pk):
     dados = {}
     usuario = Usuario.objects.get(pk=pk)
     form = user_form(request.POST or None, instance=usuario)
-
+    next = request.POST.get('next', '/')
+    print(next)
     if form.is_valid():
         form.save()
         messages.success(request, 'Os dados foram alterados com sucesso')
+        if next:
+            return HttpResponseRedirect(next)
         return redirect('usuarios:index')
 
     dados['form'] = form
@@ -131,7 +136,7 @@ def up_beneficiario(request, pk):
     if form.is_valid():
         form.save()
         messages.success(request, 'Os dados foram alterados com sucesso')
-        return redirect('usuarios:busca_beneficiarios')
+        return redirect(request.get_full_path())
 
     dados['form'] = form
     dados['beneficiario'] = beneficiario
@@ -178,18 +183,31 @@ def upload_dados(request):
     io_string = io.StringIO(data_set)
     next(io_string)
     for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-        _, created = Usuario.objects.update_or_create(
+
+        obj, created = Usuario.objects.update_or_create(
             CPF=column[0],
-            NIS=column[1],
-            nome=column[2],
-            nascimento=column[3],
-            nome_mae=column[4],
-            endereco="Sem Endereço",
-            bairro="Sem Endereço",
-            cidade='Igarassu',
-            observacoes=column[5],
-            user=request.user,
-            status='OFF'
-        )
+            defaults={
+                'NIS': column[1],
+                'nome': column[2],
+                'nascimento': column[3],
+                'nome_mae': column[4],
+                'endereco': column[5],
+                'bairro': "SEM BAIRRO",
+                'cidade': 'IGARASSU',
+                'observacoes': column[6],
+                'user': request.user,
+                'status': 'OFF',
+            })
     context = {}
     return render(request, template, context)
+
+@login_required
+def usuarios_details(request, pk):
+    context = {}
+    usuario = get_object_or_404(Usuario, pk=pk)
+    context = {
+        'usuario': usuario,
+    }
+    template_name = 'usuarios/usuario_details.html'
+
+    return render(request, template_name, context)
