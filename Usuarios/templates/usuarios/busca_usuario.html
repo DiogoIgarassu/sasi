@@ -26,7 +26,12 @@
         {% if usuarios %}
         <ul>
             {% for usuario in usuarios %}
-                <li><a href="{% url 'usuarios:usuarios_details' usuario.id %}"> {{ usuario.CPF }} - {{ usuario.nome }} - {{ enderenco }} </a></li>
+                <li><a href="{% url 'usuarios:usuarios_details' usuario.id %}"> {{ usuario.CPF }} - {{ usuario.nome }} - {{ usuario.endereco }} </a>-
+                {% if usuario.status == "ON" %}
+                    <font color="green">Ativo</font>
+                    {% else %}
+                    <font color="red">Inativo</font>
+                {% endif %}</li>
             {% endfor %}
         </ul>
         {% endif %}

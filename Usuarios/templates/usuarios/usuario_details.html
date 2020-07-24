@@ -52,14 +52,15 @@ body, html{
             {% endif %}
           </div>
         <div id="div2" align="left">
-             <b>CPF:</b> {{ usuario.CPF }} <b>NIS:</b> {{ usuario.NIS }} <br>
-            <b>Nascimento:</b> {{ usuario.nascimento }}  <b>Nome da Mãe:</b> {{ usuario.nome_mae }} <br>
-            <b>Endereço:</b> {{ usuario.endereco }}  <b>Bairro:</b> {{ usuario.bairro }} <b>Cidade:</b> {{ usuario.cidade }} <br>
-            <b>Ponto de Referência:</b> {{ usuario.referencia }}  <b>Telefone:</b> {{ usuario.telefone1 }} <b>Telefone:</b> {{ usuario.telefone2 }} <br>
-            <b>Observações:</b> {{ usuario.observacoes }}  <br>
-            <b>Status:</b> {{ usuario.status }} <b>Última Atualização:</b> {{ usuario.update_at }} <b>feita por</b> {{ usuario.user }}
+             <p><b>CPF:</b> {{ usuario.CPF }} <b>NIS:</b> {{ usuario.NIS }} </p>
+            <p><b>Nascimento:</b> {{ usuario.nascimento }}  <b>Nome da Mãe:</b> {{ usuario.nome_mae }} </p>
+            <p><b>Endereço:</b> {{ usuario.endereco }}  <b>Bairro:</b> {{ usuario.bairro }} <b>Cidade:</b> {{ usuario.cidade }} </p>
+           <p> <b>Ponto de Referência:</b> {{ usuario.referencia }}  <b>Telefone:</b> {{ usuario.telefone1 }} <b>Telefone:</b> {{ usuario.telefone2 }} </p>
+            <p><b>Observações:</b> {{ usuario.observacoes }}  </p>
+            <p><b>Status:</b> {{ usuario.status }} <b>Última Atualização:</b> {{ usuario.update_at }} <b>feita por</b> {{ usuario.user }}</p>
         </div>
     </div>
+            <br>
             <p>
                 <a href="{% url 'usuarios:url_update' usuario.id %}" title="" class="pure-button-danger">Atualize o Cadastro</a>
                 <a href="{% url 'usuarios:index' %}" class="pure-button pure-button-hope">Voltar</a>

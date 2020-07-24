@@ -91,17 +91,24 @@ def add_beneficiario(request, cpf):
 
     usuario = Usuario.objects.get(CPF=cpf)
     beneficio = Beneficio.objects.get(pk=1)
-
     form = beneficiario_form(request.POST or None)
+    entregue = request.POST.get('submit', None)
+    if entregue:
+        situacao = "ENTREGUE"
+        mensagem = "benefício entregue com sucesso!"
+    else:
+        situacao = "CONCEDIDO"
+        mensagem = "Benefício concedido com sucesso!"
 
     if form.is_valid():
         inclusao = form.save(commit=False)
         inclusao.user = request.user
         inclusao.tipo_beneficio = beneficio
         inclusao.nome = usuario
+        inclusao.situacao = situacao
         inclusao.is_active = True
         inclusao.save()
-        messages.success(request, 'BenefÍcio entregue com sucesso')
+        messages.success(request, mensagem)
         return redirect('usuarios:busca_beneficiarios')
 
     data['frase'] = "Adicionar Novo Usuário"
@@ -115,10 +122,9 @@ def up_usuario(request, pk):
     usuario = Usuario.objects.get(pk=pk)
     form = user_form(request.POST or None, instance=usuario)
     next = request.POST.get('next', '/')
-    print(next)
     if form.is_valid():
         form.save()
-        messages.success(request, 'Os dados foram alterados com sucesso')
+        messages.success(request, 'Os dados foram alterados com sucesso!')
         if next:
             return HttpResponseRedirect(next)
         return redirect('usuarios:index')
@@ -132,11 +138,20 @@ def up_beneficiario(request, pk):
     dados = {}
     beneficiario = Beneficiario.objects.get(pk=pk)
     form = beneficiario_form(request.POST or None, instance=beneficiario)
+    entregue = request.POST.get('submit', None)
+    if entregue:
+        situacao = "ENTREGUE"
+        mensagem = "Benefício Entrege com Sucesso!"
+    else:
+        situacao = "CONCEDIDO"
+        mensagem = 'Os dados foram alterados com sucesso!'
 
     if form.is_valid():
-        form.save()
-        messages.success(request, 'Os dados foram alterados com sucesso')
-        return redirect(request.get_full_path())
+        alteracao = form.save(commit=False)
+        alteracao.situacao = situacao
+        alteracao.save()
+        messages.success(request, mensagem)
+        return redirect('usuarios:busca_beneficiarios')
 
     dados['form'] = form
     dados['beneficiario'] = beneficiario
@@ -183,7 +198,6 @@ def upload_dados(request):
     io_string = io.StringIO(data_set)
     next(io_string)
     for column in csv.reader(io_string, delimiter=',', quotechar="|"):
-
         obj, created = Usuario.objects.update_or_create(
             CPF=column[0],
             defaults={

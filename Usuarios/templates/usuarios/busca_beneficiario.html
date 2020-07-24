@@ -41,6 +41,7 @@
 
             <td bgcolor="grey" style="color:#000000;font-weight: bold; ">  CPF: <br>{{ usuario.CPF }} </td>
                 <td bgcolor="grey" style="color:#000000;font-weight: bold;">  NOME:<br>{{ usuario.nome }}</td>
+                <td bgcolor="grey" style="color:#000000;font-weight: bold;">SITUAÇÃO</td>
                 <td ><a href="{% url 'usuarios:incluir_beneficio' usuario.CPF %}" class="pure-button pure-button-primary">Conceder Cesta Básica</a></td>
                 {% endfor %}
         {% endif %}
@@ -50,7 +51,15 @@
 
             {% for beneficio in beneficiarios %}
             <tr><td><a href="{% url 'usuarios:update_beneficiario' beneficio.pk %}"><i class="fa fa-eye"></i> {{ beneficio.tipo_beneficio}} </a></td>
-                <td align="center">{{ beneficio.data_beneficio }} </td></tr>
+                <td align="center">{{ beneficio.data_beneficio }} </td>
+                <td align="center" valign="center">
+                                    {% if beneficio.situacao == "ENTREGUE" %}
+                                        <b style="color:green;">ENTREGUE</b>
+                                    {% else %}
+                                        <b style="color:red;">CONCEDIDO</b>
+
+                                    {% endif %}
+                </td></tr>
             {% endfor %}
 
             </table>

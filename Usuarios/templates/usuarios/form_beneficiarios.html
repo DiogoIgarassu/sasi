@@ -24,9 +24,11 @@
                 <div class="pure-controls">
 
                 {% if beneficiario %}
-                    <button type="submit" class="pure-button pure-button-primary">Salvar Alterações</button>
+                    <button type="submit" class="pure-button pure-button-danger">Salvar Alterações</button>
+                    <button type="submit" name="submit" value="entregue" class="pure-button pure-button-primary">Cesta entregue</button>
                 {% else %}
-                    <button type="submit" class="pure-button pure-button-primary">+ Incluir</button>
+                    <button type="submit" class="pure-button pure-button-danger">Conceder Cesta</button>
+                    <button type="submit" name="submit" value="entregue" class="pure-button pure-button-primary">Cesta entregue</button>
 			    {% endif %}
 
                      <a href="{% url 'usuarios:busca_beneficiarios' %}" class="pure-button pure-button-hope">Voltar</a>

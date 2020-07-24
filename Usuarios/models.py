@@ -75,6 +75,7 @@ class Beneficiario(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                              related_name='inclusao_beneficiario', default=None)
     data_beneficio = models.DateField(null=True, blank=True)
+    situacao = models.CharField(max_length=20, blank=True)
     image = models.ImageField(
         upload_to='Usuarios/beneficios', verbose_name='Foto',
         null=True, blank=True

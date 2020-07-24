@@ -9,7 +9,7 @@ class EstoqueAdmin(admin.ModelAdmin):
     #fields = ['title', 'sub_title']
 
 class BeneficiariosAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'tipo_beneficio', 'data_beneficio']
+    list_display = ['nome', 'tipo_beneficio', 'data_beneficio', 'id']
     search_fields = ['nome']
 
 class UsuariosAdmin(admin.ModelAdmin):
