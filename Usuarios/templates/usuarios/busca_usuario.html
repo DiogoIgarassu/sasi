@@ -10,8 +10,8 @@
         <h2>Busque pelo CPF ou Nome do Usuário</h2>
         <form class="pure-form pure-form-stacked">
             {% csrf_token %}
-            <label>Digite o CPF:</label>
-			<input type="text" name="busca_cpf" maxlength="11" autofocus  placeholder="CPF">
+            <label>Digite o CPF ou NIS:</label>
+			<input type="text" name="busca_cpf" maxlength="11" autofocus  placeholder="CPF ou NIS">
             <label>Digite o nome:</label>
             <input type="text" oninput="handleInput(event)" name="busca_nome" maxlength="80" placeholder="Nome">
 <br>
@@ -23,10 +23,16 @@
 
         </form>
 
+        {% if mensagem %}
+
+        <br><p>{{ mensagem }}</p>
+
+        {% endif %}
+
         {% if usuarios %}
         <ul>
             {% for usuario in usuarios %}
-                <li><a href="{% url 'usuarios:usuarios_details' usuario.id %}"> {{ usuario.CPF }} - {{ usuario.nome }} - {{ usuario.endereco }} </a>-
+                <li><a href="{% url 'usuarios:usuarios_details' usuario.id %}"> CPF {{ usuario.CPF }} - {{ usuario.nome }} - {{ usuario.endereco }} </a>-
                 {% if usuario.status == "ON" %}
                     <font color="green">Ativo</font>
                     {% else %}

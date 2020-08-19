@@ -1,0 +1,71 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+
+        <h2>Gere a lista pelas datas</h2>
+        <form class="pure-form pure-form-stacked">
+            {% csrf_token %}
+            <label>Digite Data Inicial:</label>
+			<input type="text" name="datai" maxlength="10" autofocus  placeholder="Começa em...">
+            <label>Digite Data Final:</label>
+			<input type="text" name="dataf" maxlength="10" autofocus  placeholder="Termina em...">
+<br>
+             <div class="pure-controls">
+                 <a href="{% url 'usuarios:busca_beneficiarios' %}"><button type="submit" class="pure-button pure-button-hope">Buscar</button></a>
+                 <a href="{% url 'usuarios:all_beneficiarios' %}" class="pure-button pure-button-hope">Ver Últimas Inclusões</a>
+                 {% if beneficiarios %}
+                    <a href="{% url 'usuarios:export_cestas' datai dataf %}" class="pure-button pure-button-primary">Exportar CSV</a>
+                 {% endif%}
+             </div>
+
+        </form>
+        <br>
+
+        {% if mensagem %}
+
+        <br><p>{{ mensagem }}</p>
+
+        {% endif %}
+<br>
+
+    {% if beneficiarios %}
+
+    <table border="2px" style="border-color: black" >
+        <tr><th>Benefício</th>
+        <th>CPF</th>
+        <th>NIS</th>
+        <th>Nome</th>
+        <th>Data</th>
+        <th>Situação</th></tr>
+        {% for beneficiario in beneficiarios %}
+
+                <tr>
+                {% for usuario in usuarios %}
+                    {% if usuario.pk == beneficiario.nome.pk %}
+
+                        <td><a href="#"><i class="fa fa-eye"></i> {{ beneficiario.tipo_beneficio}} </a></td>
+                        <td> {{ usuario.CPF }} </td>
+                        <td> {{ usuario.NIS }} </td>
+                        <td> {{ usuario.nome }}</td>
+                        <td align="right">{{ beneficiario.data_beneficio }} </td>
+                        <td align="center" valign="center">
+                                    {% if beneficiario.situacao == "ENTREGUE" %}
+                                        <b style="color:green;">ENTREGUE</b>
+                                    {% else %}
+                                        <b style="color:red;">CONCEDIDO</b>
+                                    {% endif %}
+                     {% endif %}
+                 {% endfor %}
+        {% endfor %}
+
+            </table>
+    {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -15,5 +15,9 @@ urlpatterns = [
     path('incluir_beneficio/<str:cpf>/', add_beneficiario, name='incluir_beneficio'),
     path('update_beneficiario/<int:pk>/', up_beneficiario, name='update_beneficiario'),
     path('upload_dados/', upload_dados, name='upload_dados'),
+    path('upload_beneficiarios/', upload_beneficiarios, name='upload_beneficiarios'),
     path('consulta_usuario/<int:pk>/', usuarios_details, name='usuarios_details'),
+    path('listas/', listas, name='listas'),
+    path('lista_cestas/', lista_cestas, name='lista_cestas'),
+    path('export_cestas/<str:datai>&<str:dataf>/', export_cestas, name='export_cestas')
 ]

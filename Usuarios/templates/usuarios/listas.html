@@ -1,0 +1,58 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<style type="text/css">
+body, html{
+  height: 100%;
+}
+
+.menu{
+  height: 100%;
+  width: 100%;
+ }
+.listas{
+
+    left:150px;
+    widht:300px;
+
+    margin: 10px 10px 10px 10px;
+    }
+.imagem{
+
+    height: 20%;
+    }
+
+</style>
+
+<br><br><br><br><br><br>
+
+        <div align="center" class="menu">
+
+            <div class="listas">
+                <div class="imagem">
+                    <a href="{% url 'usuarios:lista_cestas' %}"><img src="{% static 'img/b_basket.png' %}">
+                    <br><button class="pure-button pure-button-primary">Aux Alimentação</button></a>
+                </div> <div class="imagem">
+                    <a href="{% url 'usuarios:busca_beneficiarios' %}"><img src="{% static 'img/bebe.png' %}" >
+                    <br><button class="pure-button pure-button-primary">Aux. Natalidade</button></a>
+                </div> <div class="imagem">
+                    <a href="{% url 'usuarios:busca_beneficiarios' %}"><img src="{% static 'img/caixao.png' %}">
+                    <br><button class="pure-button pure-button-primary">Aux. Funerário</button></a>
+                </div> <div class="imagem">
+                    <a href="{% url 'usuarios:busca_beneficiarios' %}"><img src="{% static 'img/leite.png' %}">
+                    <br><button class="pure-button pure-button-primary">Programa do Leite</button></a>
+                </div> <div class="imagem">
+                    <a href="{% url 'usuarios:busca_beneficiarios' %}"><img src="{% static 'img/pmcmv.png' %}">
+                    <br><button class="pure-button pure-button-primary">Reserva do Pitanga II</button></a>
+                </div> <div class="imagem">
+                    <a href="{% url 'usuarios:busca_beneficiarios' %}"><img src="{% static 'img/pmcmv.png' %}">
+                    <br><button class="pure-button pure-button-primary">Reserva do Pitanga I</button></a>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
