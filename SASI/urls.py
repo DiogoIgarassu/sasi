@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include('Core.urls', namespace='core')),
     path('conta/', include('Accounts.urls', namespace='accounts')),
     path('usuarios/', include('Usuarios.urls', namespace='usuarios')),
+    path('beneficiarios/', include('Beneficiarios.urls', namespace='beneficiarios')),
 ]
 if settings.DEBUG:
     urlpatterns += static(

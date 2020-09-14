@@ -64,24 +64,14 @@ body, html{
     <div class="pure-g-r content-ribbon2" align="center">
         <div align="center" class="body menu">
 
-                <div id="div1" align="center">
-                    <a href="{% url 'usuarios:index' %}"><img src="{% static 'img/b_users.png' %}" id="imagem1">
-                        <br><button class="pure-button pure-button-primary">Usuários</button></a>
-                </div>
-
-                <div id="div2" align="center">
+                  <div id="div2" align="center">
                     <a href="{% url 'usuarios:busca_beneficiarios' %}"><img src="{% static 'img/b_basket.png' %}" id="imagem2">
-                    <br><button class="pure-button pure-button-primary">Benefício Eventual</button></a>
+                    <br><button class="pure-button pure-button-primary">Cesta Básica</button></a>
                 </div>
 
                 <div id="div3" align="center">
-                    <a href="{% url 'usuarios:listas' %}"><img src="{% static 'img/b_report.png' %}" id="imagem3" >
-                    <br><button class="pure-button pure-button-primary">Listas</button></a>
-                </div>
-
-                <div id="div4" align="center">
-                   <a href="#"> <img src="{% static 'img/b_dashboard.png' %}" id="imagem4" >
-                    <br><button class="pure-button pure-button-primary">Relatórios</button></a>
+                    <a href="{% url 'beneficiarios:emergencial' %}"><img src="{% static 'img/emergencial.png' %}" id="imagem3" >
+                    <br><button class="pure-button pure-button-primary">Aux. Emergencial</button></a>
                 </div>
         </div>
     </div>
