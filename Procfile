@@ -1,1 +1,1 @@
-web: gunicorn SASI.wsgi
+web: gunicorn SASI.wsgi --log-file -
