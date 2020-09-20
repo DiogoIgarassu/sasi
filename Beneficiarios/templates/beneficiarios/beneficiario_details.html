@@ -1,0 +1,56 @@
+{% extends "core/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<style type="text/css">
+body, html{
+  height: 100%;
+}
+
+.menu{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: left;
+  justify-content: left;
+ }
+#div{
+    float: left;
+    left:20px;
+    width:80%
+    height:300px;
+    margin: 10px 10px 10px 10px;
+}
+</style>
+{% for beneficiario in beneficiarios %}
+<div class="splash">
+    <div class="pure-g-r">
+        <div class="pure-u-1">
+            <div class="l-box splash-text">
+                <h2 class="splash-head">
+                    {{ beneficiario.NOME }}
+                </h2>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="menu">
+
+        <div id="div" align="left">
+             <p><b>ID:</b> {{ beneficiario.N }} <b>CPF:</b> {{ beneficiario.CPF }} <b>NIS:</b> {{ beneficiario.NIS }} </p>
+             <p><b>Endereço:</b> {{ beneficiario.ENDERECO }}  <b>Localidade:</b> {{ beneficiario.LOCALIDADE }} </p>
+            <p> <b>Telefone(s):</b> {{ beneficiario.TELEFONE }}</p>
+            <p><b>Data:</b> {{ beneficiario.DATA }} <b>Origem:</b> {{ beneficiario.ORIGEM }}  <b>Assistente Social:</b> {{ beneficiario.AS_SOCIAL }} </p>
+            <p><b>Tipo:</b> {{ beneficiario.TIPO }}  <b>Quantidade:</b> {{ beneficiario.QUANT }} </p>
+            <p><b>Observações:</b> {{ beneficiario.OBSERVACAO }}  </p>
+           </div>
+    </div>
+            <br>
+            <p>
+                <a href="{% url 'core:home' %}" class="pure-button pure-button-hope">Inicio</a>
+                <a href="{% url 'beneficiarios:busca_cestas_cpf' beneficiario.CPF %}" title="" class="pure-button-danger">Buscar outras cestas desta pessoa</a>
+            </p>
+{% endfor %}
+{% endblock %}

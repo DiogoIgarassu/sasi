@@ -28,20 +28,6 @@ body, html{
     height:300px;
     margin: 10px 10px 10px 10px;
 }
-#div3{
-    float: left;
-    left:150px;
-    widht:300px;
-    height:300px;
-    margin: 10px 10px 10px 10px;
-}
-#div4{
-    float: left;
-    left:150px;
-    widht:300px;
-    height:300px;
-    margin: 10px 10px 10px 10px;
-}
 #imagem1{
     float: left;
     height: 50%;
@@ -50,27 +36,19 @@ body, html{
     float: left;
     height: 50%;
     }
-#imagem3{
-    float: right;
-    height: 50%;
-    }
-#imagem4{
-    float: right;
-    height: 50%;
-    }
 </style>
 
 <br><br><br><br><br><br>
     <div class="pure-g-r content-ribbon2" align="center">
         <div align="center" class="body menu">
 
-                  <div id="div2" align="center">
-                    <a href="{% url 'usuarios:busca_beneficiarios' %}"><img src="{% static 'img/b_basket.png' %}" id="imagem2">
+                  <div id="div1" align="center">
+                    <a href="{% url 'beneficiarios:busca_cestas' %}"><img src="{% static 'img/b_basket.png' %}" id="imagem1">
                     <br><button class="pure-button pure-button-primary">Cesta Básica</button></a>
                 </div>
 
-                <div id="div3" align="center">
-                    <a href="{% url 'beneficiarios:emergencial' %}"><img src="{% static 'img/emergencial.png' %}" id="imagem3" >
+                <div id="div2" align="center">
+                    <a href="{% url 'beneficiarios:emergencial' %}"><img src="{% static 'img/emergencial.png' %}" id="imagem2" >
                     <br><button class="pure-button pure-button-primary">Aux. Emergencial</button></a>
                 </div>
         </div>
