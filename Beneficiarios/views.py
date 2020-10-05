@@ -6,7 +6,15 @@ import datetime
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 import csv
-
+from collections import defaultdict
+from bokeh.plotting import figure, show, output_file
+from bokeh.embed import components
+from bokeh.models import ColumnDataSource
+from math import pi
+from bokeh.models import ColumnDataSource, HoverTool
+from bokeh.plotting import figure
+from bokeh.sampledata.autompg import autompg_clean as df
+from bokeh.transform import factor_cmap
 
 scope = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/auth/drive"]
 creds = ServiceAccountCredentials.from_json_keyfile_name('secret_client.json', scope)
@@ -169,3 +177,296 @@ def export_cestas(request, datai, dataf):
     response['Content-Disposition'] = 'attachment; filename="cesta_basica.csv"'
 
     return response
+
+dic_meses_eme = defaultdict(list)
+dic_meses_eve = defaultdict(list)
+dic_meses_total = defaultdict(list)
+dic_count = defaultdict(list)
+
+def conte_por_mes(mes, tipo):
+    global dic_meses_eme, dic_meses_eve, dic_meses_total, dic_count
+
+    if tipo == 'eme':
+        dic_count = dic_meses_eme
+    elif tipo == 'eve':
+        dic_count = dic_meses_eve
+
+    if mes == 1:
+        if dic_count[1]:
+            cont1 = int(dic_count[1]) + 1
+            cont2 = int(dic_meses_total[1]) + 1
+            dic_count[1] = cont1
+            dic_meses_total[1] = cont2
+        else:
+            dic_count[1] = 1
+            if dic_meses_total[1]:
+                cont2 = int(dic_meses_total[1]) + 1
+                dic_meses_total[1] = cont2
+            else:
+                dic_meses_total[1] = 1
+    elif mes == 2:
+        if dic_count[2]:
+            cont1 = int(dic_count[2]) + 1
+            cont2 = int(dic_meses_total[2]) + 1
+            dic_count[2] = cont1
+            dic_meses_total[2] = cont2
+        else:
+            dic_count[2] = 1
+            if dic_meses_total[2]:
+                cont2 = int(dic_meses_total[2]) + 1
+                dic_meses_total[2] = cont2
+            else:
+                dic_meses_total[2] = 1
+    elif mes == 3:
+        if dic_count[3]:
+            cont1 = int(dic_count[3]) + 1
+            cont2 = int(dic_meses_total[3]) + 1
+            dic_count[3] = cont1
+            dic_meses_total[3] = cont2
+        else:
+            dic_count[3] = 1
+            if dic_meses_total[3]:
+                cont2 = int(dic_meses_total[3]) + 1
+                dic_meses_total[3] = cont2
+            else:
+                dic_meses_total[3] = 1
+    elif mes == 4:
+        if dic_count[4]:
+            cont1 = int(dic_count[4]) + 1
+            cont2 = int(dic_meses_total[4]) + 1
+            dic_count[4] = cont1
+            dic_meses_total[4] = cont2
+        else:
+            dic_count[4] = 1
+            if dic_meses_total[4]:
+                cont2 = int(dic_meses_total[4]) + 1
+                dic_meses_total[4] = cont2
+            else:
+                dic_meses_total[4] = 1
+    elif mes == 5:
+        if dic_count[5]:
+            cont1 = int(dic_count[5]) + 1
+            cont2 = int(dic_meses_total[5]) + 1
+            dic_count[5] = cont1
+            dic_meses_total[5] = cont2
+        else:
+            dic_count[5] = 1
+            if dic_meses_total[5]:
+                cont2 = int(dic_meses_total[5]) + 1
+                dic_meses_total[5] = cont2
+            else:
+                dic_meses_total[5] = 1
+    elif mes == 6:
+        if dic_count[6]:
+            cont1 = int(dic_count[6]) + 1
+            cont2 = int(dic_meses_total[6]) + 1
+            dic_count[6] = cont1
+            dic_meses_total[6] = cont2
+        else:
+            dic_count[6] = 1
+            if dic_meses_total[6]:
+                cont2 = int(dic_meses_total[6]) + 1
+                dic_meses_total[6] = cont2
+            else:
+                dic_meses_total[6] = 1
+    elif mes == 7:
+        if dic_count[7]:
+            cont1 = int(dic_count[7]) + 1
+            cont2 = int(dic_meses_total[7]) + 1
+            dic_count[7] = cont1
+            dic_meses_total[7] = cont2
+        else:
+            dic_count[7] = 1
+            if dic_meses_total[7]:
+                cont2 = int(dic_meses_total[7]) + 1
+                dic_meses_total[7] = cont2
+            else:
+                dic_meses_total[7] = 1
+    elif mes == 8:
+        if dic_count[8]:
+            cont1 = int(dic_count[8]) + 1
+            cont2 = int(dic_meses_total[8]) + 1
+            dic_count[8] = cont1
+            dic_meses_total[8] = cont2
+        else:
+            dic_count[8] = 1
+            if dic_meses_total[8]:
+                cont2 = int(dic_meses_total[8]) + 1
+                dic_meses_total[8] = cont2
+            else:
+                dic_meses_total[8] = 1
+    elif mes == 9:
+        if dic_count[9]:
+            cont1 = int(dic_count[9]) + 1
+            cont2 = int(dic_meses_total[9]) + 1
+            dic_count[9] = cont1
+            dic_meses_total[9] = cont2
+        else:
+            dic_count[9] = 1
+            if dic_meses_total[9]:
+                cont2 = int(dic_meses_total[9]) + 1
+                dic_meses_total[9] = cont2
+            else:
+                dic_meses_total[9] = 1
+    elif mes == 10:
+        if dic_count[10]:
+            cont1 = int(dic_count[10]) + 1
+            cont2 = int(dic_meses_total[10]) + 1
+            dic_count[10] = cont1
+            dic_meses_total[10] = cont2
+        else:
+            dic_count[10] = 1
+            if dic_meses_total[10]:
+                cont2 = int(dic_meses_total[10]) + 1
+                dic_meses_total[10] = cont2
+            else:
+                dic_meses_total[10] = 1
+    elif mes == 11:
+        if dic_count[1]:
+            cont1 = int(dic_count[1]) + 1
+            cont2 = int(dic_meses_total[11]) + 1
+            dic_count[11] = cont1
+            dic_meses_total[11] = cont2
+        else:
+            dic_count[11] = 1
+            if dic_meses_total[11]:
+                cont2 = int(dic_meses_total[11]) + 1
+                dic_meses_total[11] = cont2
+            else:
+                dic_meses_total[11] = 1
+    elif mes == 12:
+        if dic_count[12]:
+            cont1 = int(dic_count[12]) + 1
+            cont2 = int(dic_meses_total[12]) + 1
+            dic_count[12] = cont1
+            dic_meses_total[12] = cont2
+        else:
+            dic_count[12] = 1
+            if dic_meses_total[12]:
+                cont2 = int(dic_meses_total[12]) + 1
+                dic_meses_total[12] = cont2
+            else:
+                dic_meses_total[12] = 1
+
+    if tipo == 'eme':
+        dic_meses_eme = dic_count
+    elif tipo == 'eve':
+        dic_meses_eve = dic_count
+
+
+    return dic_meses_eve, dic_meses_eme, dic_meses_total
+
+
+
+
+
+@login_required
+def relatorios(request):
+    sheet = client.open('cesta_basica_emergencial').sheet1
+    dados = sheet.get_all_records()
+    template_name = 'beneficiarios/relatorios.html'
+    eventual_count = 0
+    emergencial_count = 0
+    total_count = 0
+    context = {}
+    data_atual = datetime.date.today()
+    mes_atual = data_atual.month
+
+    global dic_meses_total, dic_meses_eme, dic_meses_eve
+    dic_meses_total = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+    dic_meses_eme = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+    dic_meses_eve = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+
+
+
+
+    for dic in dados:
+        data_benef = dic['DATA']
+        data_benef = datetime.datetime.strptime(data_benef, '%d/%m/%Y')
+        mes = data_benef.month
+        if 'EVENTUAL' == dic['TIPO']:
+            eventual_count += 1
+            total_count += 1
+            conte_por_mes(mes, 'eve')
+        elif 'EMERGENCIAL' == dic['TIPO']:
+            emergencial_count += 1
+            total_count += 1
+            conte_por_mes(mes, 'eme')
+
+    '''print(dic_meses_total, 'Dicionario total')
+    print(dic_meses_eme, 'Dicionario emergencial')
+    print(dic_meses_eve, 'Dicionario eventual')'''
+    context['total'] = total_count
+    context['total_eme'] = emergencial_count
+    context['total_eve'] = eventual_count
+    mes_aterior = mes - 1
+    context['total_anterior'] = dic_meses_total[mes_aterior]
+    context['eme_anterior'] = dic_meses_eme[mes_aterior]
+    context['eve_anterior'] = dic_meses_eve[mes_aterior]
+    context['total_atual'] = dic_meses_total[mes]
+    context['eme_atual'] = dic_meses_eme[mes]
+    context['eve_atual'] = dic_meses_eve[mes]
+
+    # DEFININDO NOME DO EIXO X E Y
+    x_axis = 'Distruibuição de Cestas Básicas por mês em 2020.'
+    y_axis = 'plotado por https://sasi-igarassu.herokuapp.com/'
+
+    TOOLTIPS = [("Cidade", "@x"), ("Total", "@y")]
+
+    meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+
+    # DEFININDO AS CONFIGURAÇÕES DO GRÁFICO 1
+    plt = figure(x_range=meses, plot_width=800, plot_height=450, title="tipo",
+                 toolbar_location="right", x_axis_label=x_axis,
+                 y_axis_label=y_axis, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
+                 tooltips=TOOLTIPS)
+
+    plt.xaxis.major_label_orientation = pi / 4
+    plt.sizing_mode = 'scale_width'
+
+    lista_total = []
+    for mes in dic_meses_total:
+        lista_total.append(mes)
+    source = ColumnDataSource(data=dict(x=meses, y=lista_total))
+    plt.vbar('x', top='y', color="#ffba57", bottom=0, width=0.6, source=source)
+    plt.vbar('x', top='y', color="#ff5252", bottom=0, width=0.6, source=source)
+    plt.line(x=meses, y=lista_total, color='red', legend_label='MORTOS', line_width=3)
+
+    #print(meses)
+    #print(lista_total)
+    script, div = components(plt)
+    context['script'] = script
+    context['div'] = div
+
+    plt2 = figure(x_range=['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
+                  , plot_width=800, plot_height=800, title="tipo",
+                 toolbar_location="right", x_axis_label=x_axis,
+                 y_axis_label=y_axis, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
+                 tooltips=TOOLTIPS)
+
+    plt2.line(x=['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'],
+              y=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], color='red', legend_label='MORTOS', line_width=3)
+
+
+
+
+    mensagem = "Em 2020 foram {0} Cestas eventuais e {1} cestas " \
+               "emergenciais. Em julho foram {2} Cestas, " \
+               "no mês atual foram até o momento {3}".format(eventual_count, emergencial_count,
+                                                             dic_meses_total[7], dic_meses_total[mes_atual])
+
+    context['mensagem'] = mensagem
+
+
+    # create some example data
+    output_file('vbar.html')
+
+    p = figure(plot_width=400, plot_height=400)
+    p.vbar(x=[1, 2, 3], width=0.5, bottom=0,
+           top=[1.2, 2.5, 3.7], color="firebrick")
+    script2, div2 = components(p)
+    show(p)
+    context['script2'] = script2
+    context['div2'] = div2
+    return render(request, template_name, context)
+

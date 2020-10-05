@@ -1,0 +1,61 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+  {{script | safe}}
+  {{script2 | safe}}
+<style type="text/css">
+body, html{
+  height: 100%;
+}
+.menu{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center
+ }
+#div1{
+    float: left;
+    left:150px;
+    widht:300px;
+    height:300px;
+    margin: 10px 10px 10px 10px;
+}
+#div2{
+    widht:300px;
+    height:300px;
+    margin: 10px 10px 10px 10px;
+}
+</style>
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+        <p>.</p>
+        <h2>Painel informativo do SASI</h2>
+
+
+        <p><b>TOTAL DE CESTAS BÁSICAS ENTREGUES EM 2020: {{ total }}</b></p>
+            <li>Cestas Eventuais entregues em 2020:<b> {{ total_eve }}</b></li>
+            <li>Cestas Emergenciais entregues em 2020:<b> {{ total_eme }}</b></li>
+        <p><b>TOTAL DE CESTAS BÁSICAS ENTREGUES NO MÊS ANTERIOR: {{ total_anterior }}</b></p>
+            <li>Cestas Eventuais entregues no mês anterior:<b> {{ eve_anterior }}</b></li>
+            <li>Cestas Emergenciais entregues no mês anterior:<b> {{ eme_anterior }}</b></li>
+
+        {{div2 | safe}}
+        <div class="div1">
+        {{div | safe}}
+        </div>
+
+        <p><b>TOTAL DE CESTAS BÁSICAS ENTREGUES NESTE MÊS: {{ total_atual }}</b></p>
+            <li>Cestas Eventuais entregues neste mês:<b> {{ eve_atual }}</b></li>
+            <li>Cestas Emergenciais entregues neste mês:<b> {{ eme_atual }}</b></li>
+
+
+
+    </div>
+</div>
+<div class="div2"> {{div | safe}}</div>
+
+{% endblock %}
