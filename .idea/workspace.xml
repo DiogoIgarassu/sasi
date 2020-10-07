@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f83c21b6-c845-4889-a416-586b0cc4d27d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sasi-igarassu" beforeDir="false" afterPath="$PROJECT_DIR$/sasi-igarassu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sasi-igarassu/venv/Lib/site-packages/django/conf/global_settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/sasi-igarassu/venv/Lib/site-packages/django/conf/global_settings.py" afterDir="false" />
     </list>
@@ -23,10 +23,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Beneficiarios/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-447">
+            <state relative-caret-position="-350">
               <caret line="435" column="5" selection-start-line="435" selection-start-column="5" selection-end-line="435" selection-end-column="5" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
@@ -37,6 +37,15 @@
                 <element signature="e#4780#6059#0" />
                 <element signature="e#6219#6771#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Procfile">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="36" selection-start-column="36" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -320,7 +329,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.95090014" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.24713585" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" weight="0.3289689" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -547,13 +556,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Procfile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="36" selection-start-column="36" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SASI/settings.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="422">
@@ -749,7 +751,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Beneficiarios/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-447">
+        <state relative-caret-position="-350">
           <caret line="435" column="5" selection-start-line="435" selection-start-column="5" selection-end-line="435" selection-end-column="5" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
@@ -760,6 +762,13 @@
             <element signature="e#4780#6059#0" />
             <element signature="e#6219#6771#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Procfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="36" selection-start-column="36" selection-end-column="36" />
         </state>
       </provider>
     </entry>
