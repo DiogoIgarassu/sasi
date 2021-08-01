@@ -4,15 +4,15 @@
 {% block content %}
 
 <div class="pure-g-r content-ribbon">
-
     <div class="pure-u-1">
         <h2>Auxílio Emergencial</h2>
         <h3>Busque pelo CPF ou Nome do Usuário</h3>
         <form class="pure-form pure-form-stacked">
             {% csrf_token %}
          <select name="tipo_busca" style="width:100px;">
+             <option value="Nome">NOME</option>
             <option value="CPF">CPF</option>
-            <option value="Nome">NOME</option>
+
          </select>
          <input type="text" oninput="handleInput(event)" name="busca" maxlength="100" placeholder="DIGITE AQUI">
              <div class="pure-controls">

@@ -72,7 +72,7 @@ def busca_cestas(request, cpf=None):
             sheet = client.open('cesta_basica_emergencial').sheet1
             dados = sheet.get_all_records()
             if tipo_busca == 'CPF':
-                busca = int(busca)
+                #busca = int(busca)
                 for dic in dados:
                     if busca == dic['CPF']:
                         beneficiarios.append(dic)
@@ -376,9 +376,6 @@ def relatorios(request):
     dic_meses_total = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
     dic_meses_eme = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
     dic_meses_eve = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
-
-
-
 
     for dic in dados:
         data_benef = dic['DATA']
