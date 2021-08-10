@@ -2,13 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f83c21b6-c845-4889-a416-586b0cc4d27d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/SAS.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/SAS.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/beneficiario_register.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/busca_auxilio.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/busca_auxilio.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/beneficiario_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/beneficiario_details.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/busca_cestas.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/busca_cestas.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Beneficiarios/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Beneficiarios/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core/templates/core/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/Core/templates/core/base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sasi-igarassu" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -156,11 +157,12 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/manage.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Projetos Django\SAS\Beneficiarios\templates\beneficiarios" />
       <recent name="C:\Users\Diogo\PycharmProjects\SAS\Beneficiarios\templates\beneficiarios" />
       <recent name="C:\Users\Diogo\PycharmProjects\SAS\Beneficiarios" />
       <recent name="C:\Users\Diogo\PycharmProjects\SAS\Core\templates\core" />
@@ -270,6 +272,14 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="request.POST" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Usuarios/templates/usuarios/usuario_details.html">

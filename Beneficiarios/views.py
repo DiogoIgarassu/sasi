@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from django.contrib.auth.decorators import login_required
@@ -20,6 +20,19 @@ scope = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/aut
 creds = ServiceAccountCredentials.from_json_keyfile_name('secret_client.json', scope)
 client = gspread.authorize(creds)
 
+
+def Conta_cestas(beneficiario):
+    conta = 0
+    ultima_data = ''
+    meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
+             '9_MES', '10_MES', '11_MES', '12_MES']
+    for mes in meses:
+        for key in beneficiario:
+            if mes == key and '/' in beneficiario[key]:
+                conta += 1
+                ultima_data = beneficiario[key]
+
+    return conta, ultima_data
 
 @login_required
 def busca_auxlio(request):
@@ -55,7 +68,7 @@ def busca_auxlio(request):
 
 @login_required
 def busca_cestas(request, cpf=None):
-
+    cont_cestas = 0
     if cpf:
         tipo_busca = "CPF"
         busca = cpf
@@ -77,7 +90,7 @@ def busca_cestas(request, cpf=None):
                     if busca == dic['CPF']:
                         beneficiarios.append(dic)
             elif tipo_busca == 'NIS':
-                busca = busca.upper()
+                #busca = busca.upper()
                 for dic in dados:
                     if busca in dic['NIS']:
                         beneficiarios.append(dic)
@@ -86,6 +99,7 @@ def busca_cestas(request, cpf=None):
                 for dic in dados:
                     if busca in dic['NOME']:
                         beneficiarios.append(dic)
+                        dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
             else:
                 mensagem = "Nenhum beneficiário encontrato."
     except:
@@ -96,21 +110,76 @@ def busca_cestas(request, cpf=None):
 
 @login_required
 def beneficiario_details(request, pk):
+    #print('método: ', request.method)
     sheet = client.open('cesta_basica_emergencial').sheet1
+    pks = str(pk)
+    cell = sheet.find(pks, None, in_column=1)
+    #print(cell.address, cell.row, cell.col, cell.value)
+    address = str(cell.address)
+    #print(address)
     dados = sheet.get_all_records()
     beneficiarios = []
+    if request.method == 'POST':
+        ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'DATA_SOLICITACAO',
+                 'ORIGEM',	'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES',	'3_MES', '1A_RENOVACAO',
+                 '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
+                 '10_MES', '11_MES', '12_MES', 'OBSERVACOES']
+        updados = dict(request.POST.items())
+        #print(updados)
+        uplist = []
+        for item in ORDEM:
+            for key in updados:
+                if key == item:
+                    uplist.append(updados[key])
+        sheet.update(f'{address}:AD56', [uplist])
+        messages.success(request, 'Cadastro alterado com sucesso')
+        return redirect('beneficiarios:busca_cestas')
     try:
        for dic in dados:
             if pk == dic['N']:
                 beneficiarios.append(dic)
        else:
             mensagem = "Nenhum beneficiário encontrato."
+            messages.info(request, 'Nenhum beneficiário encontrato.')
     except:
         mensagem = "Dados inválidos."
 
     template_name = 'beneficiarios/beneficiario_details.html'
 
-    return render(request, template_name, {'beneficiarios': beneficiarios, 'mensagem': mensagem})
+    return render(request, template_name, {'beneficiario': beneficiarios, 'mensagem': mensagem})
+
+@login_required
+def beneficiario_register(request):
+    print('método: ', request.method)
+    sheet = client.open('cesta_basica_emergencial').sheet1
+    values_list = sheet.col_values(1)
+    del(values_list[0])
+    values_list= list(map(int, values_list))
+    ult_id = max(values_list, key=int)
+    novo_id = ult_id + 1
+    #pos_col = f'A{novo_id + 1}'
+    beneficiarios = []
+    if request.method == 'POST':
+        ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'DATA_SOLICITACAO',
+                 'ORIGEM',	'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES',	'3_MES', '1A_RENOVACAO',
+                 '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
+                 '10_MES', '11_MES', '12_MES', 'OBSERVACOES']
+        updados = dict(request.POST.items())
+        uplist = []
+        updados['N'] = novo_id
+        for item in ORDEM:
+            for key in updados:
+                if key == item:
+                    uplist.append(updados[key])
+
+        sheet.update(f'A{novo_id+1}:AD56', [uplist])
+        messages.success(request, 'Usuário cadastrado com sucesso')
+        return redirect('beneficiarios:busca_cestas')
+
+    template_name = 'beneficiarios/beneficiario_register.html'
+
+    return render(request, template_name, {'beneficiario': beneficiarios})
+
 
 @login_required
 def lista_cestas(request):

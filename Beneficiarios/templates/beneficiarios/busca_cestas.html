@@ -20,7 +20,8 @@
              </select>
              <input type="text" oninput="handleInput(event)" name="busca" maxlength="100" placeholder="DIGITE AQUI">
                  <div class="pure-controls">
-                     <a href="{% url 'beneficiarios:busca_cestas' %}"><button type="submit" class="pure-button pure-button-hope">Buscar</button></a>
+                     <a href="{% url 'beneficiarios:busca_cestas' %}"><button type="submit" class="btn btn-success">Buscar</button></a>
+                     <a href="{% url 'beneficiarios:registrar_cesta' %}" class="btn btn-info">Adcionar Beneficiário</a>
                  </div>
             </form>
         {% endif %}
@@ -41,21 +42,21 @@
             <th>NOME</th>
             <th>ENDEREÇO</th>
             <th>ORIGEM</th>
-            <th>TIPO</th>
-            <th>QUANTIDADE</th>
+            <th>STATUS</th>
+            <th>RECEBIDAS</th>
         </tr>
         <ul>
             {% for beneficiario in beneficiarios %}
             <tr align="center">
                     <td>{{ beneficiario.N }} </td>
-                    <td> {{ beneficiario.MES_INICIO }}</td>
+                    <td> {{ beneficiario.ULT_CESTA }}</td>
                     <td> {{ beneficiario.CPF }}</td>
                     <td> {{ beneficiario.NIS }}</td>
                 <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
-                    <td> {{ beneficiario.ENDEREÇO }} </td>
+                    <td> {{ beneficiario.ENDERECO }} </td>
                     <td> {{ beneficiario.ORIGEM }} </td>
-                    <td>{{ beneficiario.REFERENCIADA }} </td>
-                    <td>{{ beneficiario.CESTA_A_RECEBER}} </td>
+                    <td>{{ beneficiario.STATUS }} </td>
+                    <td>{{ beneficiario.QTAS_CESTAS}} </td>
             </tr>
             {% endfor %}
         </ul>
