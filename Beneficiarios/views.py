@@ -150,7 +150,7 @@ def beneficiario_details(request, pk):
 
 @login_required
 def beneficiario_register(request):
-    print('método: ', request.method)
+    #print('método: ', request.method)
     sheet = client.open('cesta_basica_emergencial').sheet1
     values_list = sheet.col_values(1)
     del(values_list[0])
@@ -159,11 +159,12 @@ def beneficiario_register(request):
     novo_id = ult_id + 1
     #pos_col = f'A{novo_id + 1}'
     beneficiarios = []
+    dic = {}
+    ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'DATA_SOLICITACAO',
+             'ORIGEM', 'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES', '3_MES', '1A_RENOVACAO',
+             '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
+             '10_MES', '11_MES', '12_MES', 'OBSERVACOES']
     if request.method == 'POST':
-        ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'DATA_SOLICITACAO',
-                 'ORIGEM',	'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES',	'3_MES', '1A_RENOVACAO',
-                 '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
-                 '10_MES', '11_MES', '12_MES', 'OBSERVACOES']
         updados = dict(request.POST.items())
         uplist = []
         updados['N'] = novo_id
@@ -175,10 +176,14 @@ def beneficiario_register(request):
         sheet.update(f'A{novo_id+1}:AD56', [uplist])
         messages.success(request, 'Usuário cadastrado com sucesso')
         return redirect('beneficiarios:busca_cestas')
+    for key in ORDEM:
+        dic[key] = ''
+    dic['N'] = novo_id
+    beneficiarios.append(dic)
+    novo_cadastro = True
+    template_name = 'beneficiarios/beneficiario_details.html'
 
-    template_name = 'beneficiarios/beneficiario_register.html'
-
-    return render(request, template_name, {'beneficiario': beneficiarios})
+    return render(request, template_name, {'beneficiario': beneficiarios, 'novo': novo_cadastro})
 
 
 @login_required

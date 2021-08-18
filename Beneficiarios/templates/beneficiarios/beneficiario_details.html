@@ -3,8 +3,13 @@
 {% block content %}
 
 
-{% for dados in beneficiario %}
 <p>Cadastro de Beneficiários de Cesta Básica</p>
+{% if novo%}
+    <h2>Cadastrar novo beneficiário.</h2>
+{% endif %}
+{% for dados in beneficiario %}
+
+
 <h2>{{ dados.NOME }}</h2>
 <div class="container">
 <form class="needs-validation" method="post" novalidate>
@@ -23,9 +28,6 @@
     <div class="col-5">
       <label for="validationCustom02">Tipo</label>
       <input type="text" class="form-control" name="TIPO" id="validationCustom02" value="{{ dados.TIPO }}" >
-      <div class="valid-feedback">
-        Looks good!
-      </div>
     </div>
 
     <div class="col-5">
@@ -40,21 +42,18 @@
 
 
     <div class="form-row">
-    <div class="col-4">
+    <div class="col-sm-4">
       <label for="validationCustom04">CPF</label>
       <input type="text" class="form-control" name="CPF" id="validationCustom04" value="{{ dados.CPF }}" required>
-      <div class="valid-feedback">
-        Muito Bom!
+      <div class="invalid-feedback">
+        Por favor informe o CPF.
       </div>
     </div>
-    <div class="col-4">
+    <div class="col-sm-4">
       <label for="validationCustom05">NIS</label>
       <input type="text" class="form-control" name="NIS" id="validationCustom05" value="{{ dados.NIS }}" >
-      <div class="valid-feedback">
-        Looks good!
-      </div>
     </div>
-        <div class="col-4">
+        <div class="col-sm-4">
       <label for="validationCustom06">RG</label>
       <input type="text" class="form-control" name="RG" id="validationCustom06" value="{{ dados.RG }}" >
       <div class="invalid-feedback">
@@ -63,32 +62,32 @@
     </div>
   </div>
   <div class="form-row">
-    <div class="col-8">
+    <div class="col-sm-8 sm-12">
       <label for="validationCustom07">Nome</label>
       <input type="text" class="form-control" name="NOME" id="validationCustom07" value="{{ dados.NOME }}" required>
       <div class="invalid-feedback">
-        Please provide a valid city.
+        Por favor informe o nome completo.
       </div>
     </div>
       </div>
 
 
   <div class="form-row">
-    <div class="col-5">
+    <div class="col-sm-5 sm-12">
       <label for="validationCustom08">Endereço</label>
       <input type="text" class="form-control" name="ENDERECO" id="validationCustom08" value="{{ dados.ENDERECO }}" required>
       <div class="invalid-feedback">
-        Please provide a valid state.
+        Por favor informe o endereço.
       </div>
     </div>
-    <div class="col-4">
+    <div class="col-sm-4 sm-6">
       <label for="validationCustom09">Localidade</label>
       <input type="text" class="form-control" name="BAIRRO" id="validationCustom09" value="{{ dados.BAIRRO }}" required>
       <div class="invalid-feedback">
-        Please provide a valid zip.
+        Por favor informe o bairro.
       </div>
     </div>
-        <div class="col-3">
+        <div class="col-sm-3 sm-6">
       <label for="validationCustom10">Contato</label>
       <input type="text" class="form-control" name="TELEFONE" id="validationCustom10" value="{{ dados.TELEFONE }}" >
       <div class="invalid-feedback">
@@ -98,28 +97,28 @@
   </div>
 
   <div class="form-row">
-      <div class="col-3">
+      <div class="col-sm-3 sm-6">
         <label for="validationCustom13">Próxima Entrega</label>
         <input type="text" class="form-control" name="PROX_ENTREGA" id="validationCustom13" value="{{ dados.PROX_ENTREGA }}" >
         <div class="invalid-feedback">
         Please provide a valid zip.
       </div>
     </div>
-      <div class="col-3">
+      <div class="col-sm-3 sm-6">
        <label for="validationCustom14">Cesta à Receber</label>
        <input type="text" class="form-control" name="PROX_CESTA" id="validationCustom14" value="{{ dados.PROX_CESTA }}" >
           <div class="invalid-feedback">
         Please provide a valid zip.
       </div>
     </div>
-    <div class="col-3">
+    <div class="col-md-3">
       <label for="validationCustom11">Origem da Demanda</label>
       <input type="text" class="form-control" name="ORIGEM" id="validationCustom11"  value="{{ dados.ORIGEM }}" required>
       <div class="invalid-feedback">
         Por favor identifica a origem da demanda.
       </div>
     </div>
-    <div class="col-3">
+    <div class="col-md-3">
       <label for="validationCustom12">Técnico Social</label>
       <input type="text" class="form-control" name="TECNICO_RESPONSAVEL" id="validationCustom12" value="{{ dados.TECNICO_RESPONSAVEL }}" >
       <div class="invalid-feedback">
@@ -136,7 +135,7 @@
           <label for="validationCustom15"><b>Data da Solicitação</b></label>
           <input type="text" class="form-control" name="DATA_SOLICITACAO" id="validationCustom15" value="{{ dados.DATA_SOLICITACAO }}" required>
           <div class="invalid-feedback">
-            Please provide a valid state.
+            Por favaor informe da Data de Solicitação.
           </div>
         </div>
 <div class="col-md-12">
@@ -163,27 +162,31 @@
      </div>
 
      <div class="col-sm-3 sm-3">
-            <div class="col-12"><b>Data da 1º Renovação</b></label>
-        <input type="text" class="form-control" name="1A_RENOVACAO" id="validationCustom19" value="{{ dados.1A_RENOVACAO }}" >
-        <div class="invalid-feedback">
-          Please provide a valid state.
+             <div class="col-md-12">
+            <label for="validationCustom19"><b>Data da 1º Renovação</b></label>
+            <input type="text" class="form-control" name="1A_RENOVACAO" id="validationCustom19" value="{{ dados.1A_RENOVACAO }}" >
+            <div class="invalid-feedback">
+            Please provide a valid state.
         </div>
       </div>
-<div class="col-12">
+
+<div class="col-md-12">
         <label for="validationCustom20">Data da 4º Entrega</label>
         <input type="text" class="form-control" name="4_MES" id="validationCustom20" value="{{ dados.4_MES }}" >
         <div class="invalid-feedback">
           Please provide a valid zip.
         </div>
       </div>
-<div class="col-12">
+
+<div class="col-md-12">
          <label for="validationCustom21">Data da 5º Entrega</label>
          <input type="text" class="form-control" name="5_MES" id="validationCustom21" value="{{ dados.5_MES }}" >
          <div class="invalid-feedback">
            Please provide a valid zip.
          </div>
        </div>
-<div class="col-12">
+
+<div class="col-md-12">
           <label for="validationCustom22">Data da 6º Entrega</label>
           <input type="text" class="form-control" name="6_MES" id="validationCustom22" value="{{ dados.6_MES }}" >
           <div class="invalid-feedback">
@@ -192,8 +195,8 @@
        </div>
      </div>
 
-     <div class="col-sm-3 sm-3">
-            <div class="col-md-12">
+ <div class="col-sm-3 sm-3">
+     <div class="col-md-12">
           <label for="validationCustom23"><b>Data da 2º Renovação</b></label>
           <input type="text" class="form-control" name="2A_RENOVACAO" id="validationCustom23" value="{{ dados.2A_RENOVACAO }}" >
           <div class="invalid-feedback">
@@ -259,7 +262,7 @@
      </div>
 
         <div class="form-row">
-            <div class="col-6">
+            <div class="col-sm-10">
           <label for="validationCustom31">Observações</label>
            <textarea type="text" class="form-control" name="OBSERVACOES" id="validationCustom31" rows="3" value="{{ dados.OBSERVACOES }}" ></textarea>
           <div class="invalid-feedback">
@@ -282,7 +285,9 @@
       <a href="{% url 'core:home' %}" class="btn btn-success">Inicio</a>
       <button type="submit" class="btn btn-primary">Salvar Alterações</button>
       <a href="{% url 'beneficiarios:busca_cestas' %}" title="" class="btn btn-warning">Buscar cestas</a>
-            <a href="{% url 'core:home' %}" class="btn btn-info">Adcionar Pessoa</a>
+      {% if not novo %}
+        <a href="{% url 'beneficiarios:registrar_cesta' %}" class="btn btn-info">Adcionar Pessoa</a>
+      {% endif %}
       <a href="{% url 'core:home' %}" class="btn btn-danger">Voltar</a></center>
 <br>
 </form>

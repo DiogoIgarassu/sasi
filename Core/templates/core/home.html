@@ -3,54 +3,83 @@
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <style type="text/css">
-body, html{
-  height: 100%;
-}
-.menu{
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center
+.img {
+    float: left;
+    width: 100%;
  }
-#div1{
-    float: left;
-    left:150px;
-    widht:300px;
-    height:300px;
-    margin: 10px 10px 10px 10px;
-}
-#div2{
-    float: left;
-    left:150px;
-    widht:300px;
-    height:300px;
-    margin: 10px 10px 10px 10px;
-}
-#imagem1{
-    float: left;
-    height: 50%;
-    }
-#imagem2{
-    float: left;
-    height: 50%;
-    }
 </style>
 
-<br><br><br><br><br><br>
-    <div class="pure-g-r content-ribbon2" align="center">
-        <div align="center" class="body menu">
-
-                  <div id="div1" align="center">
-                    <a href="{% url 'beneficiarios:busca_cestas' %}"><img src="{% static 'img/b_basket.png' %}" id="imagem1">
-                    <br><button class="pure-button pure-button-primary">Cesta Básica</button></a>
-                </div>
-
-                <div id="div2" align="center">
-                    <a href="{% url 'beneficiarios:emergencial' %}"><img src="{% static 'img/emergencial.png' %}" id="imagem2" >
-                    <br><button class="pure-button pure-button-primary">Aux. Emergencial</button></a>
-                </div>
+<br><br><br><br>
+    <div class="row justify-content-around">
+        <div class="col-sm-3 sm-3" align="center">
+            <div class="col-md-12" align="center">
+                <a href="{% url 'beneficiarios:busca_cestas' %}">
+                    <img src="{% static 'img/b_basket.png' %}" class="img">
+                <br><button class="pure-button pure-button-primary  img">Cesta Básica</button></a>
+            </div>
+        </div>
+        <div class="col-sm-3 sm-3">
+            <div class="col-md-12" align="center">
+                <a href="{% url 'beneficiarios:emergencial' %}">
+                    <img src="{% static 'img/emergencial.png' %}" class="img">
+                <br><button class="pure-button pure-button-primary  img">Aux. Emergencial</button></a>
+            </div>
+        </div>
+                <div class="col-sm-3 sm-3" align="center">
+            <div class="col-md-12">
+                <a href="#">
+                    <img src="{% static 'img/PMCMV.png' %}" class="img">
+                <br><button class="pure-button pure-button-primary  img">Habitação</button></a>
+            </div>
+        </div>
+                <div class="col-sm-3 sm-3" align="center">
+            <div class="col-md-12" align="center">
+                <a href="{% url 'beneficiarios:emergencial' %}">
+                    <img src="{% static 'img/b_dashboard.png' %}" class="img">
+                <br><button class="pure-button pure-button-primary  img">Painel</button></a>
+            </div>
         </div>
     </div>
-
+<br>
+<div class="row justify-content-around">
+        <div class="col-sm-3 sm-3" align="center">
+            <div class="col-md-12">
+                <a href="#">
+                    <img src="{% static 'img/bebe.png' %}" class="img">
+                <br><button class="pure-button pure-button-primary  img">Aux. Natalidade</button></a>
+            </div>
+        </div>
+        <div class="col-sm-3 sm-3" align="center">
+            <div class="col-md-12">
+                <a href="#">
+                    <img src="{% static 'img/leite.png' %}" class="img">
+                <br><button class="pure-button pure-button-primary img">Prog. Leite</button></a>
+            </div>
+        </div>
+                <div class="col-sm-3 sm-3" align="center">
+            <div class="col-md-12" align="center">
+                <a href="#">
+                    <img src="{% static 'img/caixao.png' %}"  class="img">
+                <br><button class="pure-button pure-button-primary img">Aux. Urna</button></a>
+            </div>
+        </div>
+                <div class="col-sm-3 sm-3" align="center">
+            <div class="col-md-12">
+                <a href="{% url 'beneficiarios:lista_cestas' %}">
+                    <img src="{% static 'img/b_report.png' %}" class="img">
+                <br><button class="pure-button pure-button-primary img">Baixar Relatórios</button></a>
+            </div>
+        </div>
+    </div>
+<br>
+<div class="row justify-content-start">
+        <div class="col-sm-3 sm-3" >
+            <div class="col-md-12">
+                <a href="{% url 'beneficiarios:registrar_cesta' %}">
+                    <img src="{% static 'img/b_users.png' %}" class="img">
+                <br><button class="pure-button pure-button-primary  img">Cadastrar Usuário</button></a>
+            </div>
+        </div>
+     </div>
+<br>
 {% endblock %}
