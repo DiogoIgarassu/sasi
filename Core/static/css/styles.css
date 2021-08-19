@@ -13,6 +13,9 @@ a {
 .content {
     padding-top: 2em;
 }
+.topnav a:hover {
+    border-bottom: 3px solid red;
+}
 .l-box {
     padding: 1em;
     width: 20%

@@ -2,43 +2,51 @@
 {% load static %}
 
 {% block content %}
-<style type="text/css">#imagem{
+<style type="text/css">
+#imagem{
     float: left;
     height: 100%;
-    width: 50%;
+    width: 100%;
     }
 </style>
 <div class="pure-g-r content-ribbon">
 
     <div class="pure-u-1">
+    <div class="row justify-content-center">
+        <div class="col-sm-6 sm-6" >
+            <div class="col-md-12">
+                <img src="{% static 'img/logo_igarassu.png' %}" id="imagem">
+            </div>
+        </div>
+         <div class="col-sm-6 sm-6" >
+            <div class="col-md-12">
+                <h2>Informe seus dados de cadastro</h2>
+                     <form class="pure-form pure-form-stacked" method="post">
+                        {% csrf_token %}
+                        <fieldset>
+                            {{ form.non_field_errors }}
 
-    <img src="{% static 'img/logo_igarassu.png' %}" id="imagem">
+                            {% for field in form %}
+                            <div class="pure-control-group">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {{ field.errors }}
+                            </div>
+                            {% endfor %}
 
-        <h2>Informe seus dados de cadastro</h2>
-        <form class="pure-form pure-form-stacked" method="post">
-            {% csrf_token %}
-            <fieldset>
-                {{ form.non_field_errors }}
-
-                {% for field in form %}
-                <div class="pure-control-group">
-                    {{ field.label_tag }}
-                    {{ field }}
-                    {{ field.errors }}
+                            <div class="pure-controls">
+                                <button type="submit" class="pure-button hope-button">Entrar</button>
+                            </div>
+                        </fieldset>
+                        <p>
+                        Não é cadastrado? <a href="{% url 'accounts:register' %}" title="">Cadastre-se</a> <br />
+                        </p><p>
+                        Esqueceu a senha? <a href="{% url 'accounts:password_reset' %}" title="">Nova Senha</a> <br />
+                        </p>
+                    </form>
                 </div>
-                {% endfor %}
-
-                <div class="pure-controls">
-                    <button type="submit" class="pure-button hope-button">Entrar</button>
-                </div>
-            </fieldset>
-            <p>
-            Não é cadastrado? <a href="{% url 'accounts:register' %}" title="">Cadastre-se</a> <br />
-            </p><p>
-            Esqueceu a senha? <a href="{% url 'accounts:password_reset' %}" title="">Nova Senha</a> <br />
-            </p>
-        </form>
-
+            </div>
+         </div>
     </div>
 </div>
 {% endblock %}

@@ -4,16 +4,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Simple MOOC - Uma simples plataforma de ensino a distância" />
+    <meta name="description" content="Sistema de Assistência Social de Igarassu" />
     <title>SASI</title>
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
     <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
-
     <link rel="icon" href="{% static 'img/brasil.ico' %}" type="image/x-icon">
 </head>
 <body>
+
 <script>
 function handleInput(e) {
    var ss = e.target.selectionStart;
@@ -28,15 +29,15 @@ function handleInput(e) {
 <div class="header">
 
     <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
-        <h2 class="pure-menu-heading">SASI - SISTEMA DE ASSISTÊNCIA SOCIAL DE IGARASSU</h2>
+        <h1 class="pure-menu-heading">ASSISTÊNCIA SOCIAL DE IGARASSU</h1>
 
         <ul>
-            <li class="pure-menu-selected"><a href="{% url 'core:home' %}">Início</a></li>
-            <li><a href="{% url 'beneficiarios:relatorios' %}">Relatórios</a></li>
-            <li><a href="{% url 'beneficiarios:lista_cestas' %}">Listas</a></li>
             {% if user.is_authenticated %}
-            <li><a href="">Painel</a></li>
-            <li><a href="{% url 'accounts:logout' %}">( {{ user }} ) Sair</a></li>
+            <li class="pure-menu-selected"><a href="{% url 'core:home' %}">Início</a></li>
+            <li><a href="{% url 'beneficiarios:lista_cestas' %}">Relatórios</a></li>
+            <li><a href="{% url 'beneficiarios:relatorios' %}">Painel</a></li>
+            <li><a href="">( {{ user }} ) </a></li>
+            <li><a href="{% url 'accounts:logout' %}">Sair</a></li>
             {% else %}
             <li><a href="{% url 'accounts:login' %}">Entrar</a></li>
             {% endif %}
@@ -44,6 +45,8 @@ function handleInput(e) {
     </div>
 </div>
 <div class="content">
+
+
     {% if messages %}
     <div class="pure-g-r content-ribbon">
         <aside class="pure-u-1">
@@ -53,7 +56,7 @@ function handleInput(e) {
         </aside>
     </div>
     {% endif %}
-
+    <br><br>
     {% block content %}{% endblock %}
 
   <div class="text-center p-3 text-white" style="background-color: #399433;">
