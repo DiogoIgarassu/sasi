@@ -100,10 +100,10 @@ def busca_cestas(request, cpf=None):
                     if busca in dic['NOME']:
                         beneficiarios.append(dic)
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
-            else:
-                mensagem = "Nenhum beneficiário encontrato."
     except:
         mensagem = "Dados inválidos."
+    if len(beneficiarios) == 0:
+        mensagem = "Nenhum beneficiário encontrato."
 
     return render(request, 'beneficiarios/busca_cestas.html', {'beneficiarios': beneficiarios, 'mensagem': mensagem, 'unique':unique})
 

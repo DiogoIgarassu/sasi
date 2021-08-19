@@ -3,14 +3,15 @@
 {% block content %}
 
 
-<p>Cadastro de Beneficiários de Cesta Básica</p>
+<center>
 {% if novo%}
     <h2>Cadastrar novo beneficiário.</h2>
 {% endif %}
+
 {% for dados in beneficiario %}
 
 
-<h2>{{ dados.NOME }}</h2>
+<h2>{{ dados.NOME }}</h2></center>
 <div class="container">
 <form class="needs-validation" method="post" novalidate>
 {% csrf_token %}

@@ -3,8 +3,17 @@
 
 {% block content %}
 
-<div class="pure-g-r content-ribbon">
 
+<div class="pure-g-r content-ribbon">
+<!--
+    {% if messages %}
+        <aside class="pure-u-1">
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </aside>
+     {% endif %}
+-->
     <div class="pure-u-1">
         <h2>Benefício Eventual - Cestas Básicas</h2>
         {% if unique %}
@@ -21,16 +30,15 @@
              <input type="text" oninput="handleInput(event)" name="busca" maxlength="100" placeholder="DIGITE AQUI">
                  <div class="pure-controls">
                      <a href="{% url 'beneficiarios:busca_cestas' %}"><button class="btn btn-success">Buscar</button></a>
-                     <a href="{% url 'beneficiarios:registrar_cesta' %}" ><button class="btn btn-info">Adcionar Beneficiário</button></a>
+                     <a href="{% url 'beneficiarios:registrar_cesta' %}"  class="btn btn-info">Adcionar Beneficiário </a>
                  </div>
             </form>
+
         {% endif %}
+
         {% if mensagem %}
-
         <br><p>{{ mensagem }}</p>
-
         {% endif %}
-
 
         {% if beneficiarios %}
         <table border="1">
