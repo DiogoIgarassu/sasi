@@ -4,11 +4,10 @@
     <list default="true" id="f83c21b6-c845-4889-a416-586b0cc4d27d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/beneficiario_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/beneficiario_details.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/busca_cestas.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/busca_cestas.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/lista_cesta.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/lista_cesta.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Beneficiarios/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Beneficiarios/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/static/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/Core/static/css/styles.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/templates/core/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/Core/templates/core/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/templates/core/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/Core/templates/core/home.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

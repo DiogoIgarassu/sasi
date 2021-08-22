@@ -15,17 +15,27 @@ from bokeh.models import ColumnDataSource, HoverTool
 from bokeh.plotting import figure
 from bokeh.sampledata.autompg import autompg_clean as df
 from bokeh.transform import factor_cmap
+import calendar
 
 scope = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/auth/drive"]
 creds = ServiceAccountCredentials.from_json_keyfile_name('secret_client.json', scope)
 client = gspread.authorize(creds)
 
+ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'DATA_SOLICITACAO',
+         'ORIGEM', 'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES', '3_MES', '1A_RENOVACAO',
+         '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
+         '10_MES', '11_MES', '12_MES', 'OBSERVACOES']
+
+meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
+         '9_MES', '10_MES', '11_MES', '12_MES']
+
+lista_beneficiarios = []
+
 
 def Conta_cestas(beneficiario):
     conta = 0
     ultima_data = ''
-    meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
-             '9_MES', '10_MES', '11_MES', '12_MES']
+
     for mes in meses:
         for key in beneficiario:
             if mes == key and '/' in beneficiario[key]:
@@ -82,6 +92,7 @@ def busca_cestas(request, cpf=None):
 
     try:
         if tipo_busca:
+            print(tipo_busca)
             sheet = client.open('cesta_basica_emergencial').sheet1
             dados = sheet.get_all_records()
             if tipo_busca == 'CPF':
@@ -89,11 +100,15 @@ def busca_cestas(request, cpf=None):
                 for dic in dados:
                     if busca == dic['CPF']:
                         beneficiarios.append(dic)
+                        dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
             elif tipo_busca == 'NIS':
+                print("aqui 1", busca)
                 #busca = busca.upper()
                 for dic in dados:
-                    if busca in dic['NIS']:
+                    if int(busca) == int(dic['NIS']):
+                        print("aqui 2")
                         beneficiarios.append(dic)
+                        dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
             elif tipo_busca == 'Nome':
                 busca = busca.upper()
                 for dic in dados:
@@ -120,10 +135,6 @@ def beneficiario_details(request, pk):
     dados = sheet.get_all_records()
     beneficiarios = []
     if request.method == 'POST':
-        ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'DATA_SOLICITACAO',
-                 'ORIGEM',	'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES',	'3_MES', '1A_RENOVACAO',
-                 '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
-                 '10_MES', '11_MES', '12_MES', 'OBSERVACOES']
         updados = dict(request.POST.items())
         #print(updados)
         uplist = []
@@ -160,10 +171,6 @@ def beneficiario_register(request):
     #pos_col = f'A{novo_id + 1}'
     beneficiarios = []
     dic = {}
-    ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'DATA_SOLICITACAO',
-             'ORIGEM', 'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES', '3_MES', '1A_RENOVACAO',
-             '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
-             '10_MES', '11_MES', '12_MES', 'OBSERVACOES']
     if request.method == 'POST':
         updados = dict(request.POST.items())
         uplist = []
@@ -188,15 +195,24 @@ def beneficiario_register(request):
 
 @login_required
 def lista_cestas(request):
+    global lista_beneficiarios
     context = {}
-    data_i = request.GET.get('datai', None)
-    data_f = request.GET.get('dataf', None)
+    status = request.GET.get('status', None)
+    mes = request.GET.get('mes', None)
+    #print(mes)
+    ano = request.GET.get('ano', None)
     mensagem = False
     beneficiarios = None
-
+    cont = 0
     template_name = 'beneficiarios/lista_cesta.html'
 
-    try:
+    if ano and mes:
+        ano = int(ano)
+        mes = int(mes)
+        a, b = calendar.monthrange(ano, mes)
+        data_i = f'1/{mes}/{ano}'
+        data_f = f'{b}/{mes}/{ano}'
+
         if data_i:
             sheet = client.open('cesta_basica_emergencial').sheet1
             dados = sheet.get_all_records()
@@ -210,14 +226,20 @@ def lista_cestas(request):
             for date in date_generated:
                 for dic in dados:
                     data = date.strftime("%d/%m/%Y")
-                    if data == dic['DATA']:
-                        beneficiarios.append(dic)
-    except:
-        messages.info(request, 'Usuário não encontrado!')
-        mensagem = "Certifique-se que digitou as datas corretas"
+                    for m in meses:
+                        if data == dic[m]:
+                            cont += 1
+                            dic['CONT'] = cont
+                            dic['DATA'] = data
+                            dic['QUANTAS'] = f'{m[0]}º MÊS'
+                            dic['CPF'] = dic['CPF'].replace('.', '').replace('-', '')
+                            beneficiarios.append(dic)
+                            #print(dic)
 
+        mensagem = f'De {data_i.strftime("%d/%m/%Y")} até {data_f.strftime("%d/%m/%Y")} foram distribuídas {cont} cestas básicas'
     if beneficiarios:
         context['beneficiarios'] = beneficiarios
+        lista_beneficiarios = beneficiarios
 
     if mensagem:
         context['mensagem'] = mensagem
@@ -225,28 +247,14 @@ def lista_cestas(request):
     return render(request, template_name, context)
 
 def export_cestas(request, datai, dataf):
+    global lista_beneficiarios
     response = HttpResponse(content_type='text/csv')
     cont = 0
     writer = csv.writer(response)
-    writer.writerow(['N', 'DATA', 'CPF', 'NIS', 'NOME', 'ENDERECO', 'LOCALIDADE', 'TELEFONE', 'ORIGEM'
-                        , 'AS_SOCIAL', 'TIPO', 'QUANT', 'OBSERVACAO'])
-    data_i = datetime.datetime.strptime(datai[:10], '%Y-%m-%d')
-    data_f = datetime.datetime.strptime(dataf[:10], '%Y-%m-%d')
-    if datai:
-        sheet = client.open('cesta_basica_emergencial').sheet1
-        dados = sheet.get_all_records()
-        beneficiarios = []
-        date_generated = [data_i + datetime.timedelta(days=x) for x in range(0, (data_f - data_i).days + 1)]
+    writer.writerow(ORDEM)
 
-        for date in date_generated:
-            for dic in dados:
-                data = date.strftime("%d/%m/%Y")
-                if data == dic['DATA']:
-                    beneficiarios.append(dic)
-                    linha = (dic['N'], dic['DATA'], dic['CPF'], dic['NIS'], dic['NOME'], dic['ENDERECO']
-                             , dic['LOCALIDADE'], dic['TELEFONE'], dic['ORIGEM']
-                             , dic['AS_SOCIAL'], dic['TIPO'], dic['QUANT'], dic['OBSERVACAO'],)
-                    writer.writerow(linha)
+    for linha in lista_beneficiarios:
+        writer.writerow(linha)
 
     response['Content-Disposition'] = 'attachment; filename="cesta_basica.csv"'
 
@@ -540,4 +548,5 @@ def relatorios(request):
     context['script2'] = script2
     context['div2'] = div2
     return render(request, template_name, context)
+
 

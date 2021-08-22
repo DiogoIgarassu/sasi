@@ -140,21 +140,21 @@
           </div>
         </div>
 <div class="col-md-12">
-        <label for="validationCustom16">Data da 1º Entrega</label>
+        <label for="validationCustom16" style="color: green"># Data da 1º Entrega</label>
         <input type="text" class="form-control" name="1_MES" id="validationCustom16" value="{{ dados.1_MES }}" >
         <div class="invalid-feedback">
           Please provide a valid zip.
         </div>
       </div>
 <div class="col-md-12">
-          <label for="validationCustom17">Data da 2º Entrega</label>
+          <label for="validationCustom17" style="color: green"># Data da 2º Entrega</label>
           <input type="text" class="form-control" name="2_MES" id="validationCustom17" value="{{ dados.2_MES }}" >
           <div class="invalid-feedback">
             Please provide a valid zip.
         </div>
       </div>
 <div class="col-md-12">
-          <label for="validationCustom18">Data da 3º Entrega</label>
+          <label for="validationCustom18" style="color: green"># Data da 3º Entrega</label>
           <input type="text" class="form-control" name="3_MES" id="validationCustom18" value="{{ dados.3_MES }}" >
           <div class="invalid-feedback">
             Please provide a valid zip.
@@ -172,7 +172,7 @@
       </div>
 
 <div class="col-md-12">
-        <label for="validationCustom20">Data da 4º Entrega</label>
+        <label for="validationCustom20" style="color: green"># Data da 4º Entrega</label>
         <input type="text" class="form-control" name="4_MES" id="validationCustom20" value="{{ dados.4_MES }}" >
         <div class="invalid-feedback">
           Please provide a valid zip.
@@ -180,7 +180,7 @@
       </div>
 
 <div class="col-md-12">
-         <label for="validationCustom21">Data da 5º Entrega</label>
+         <label for="validationCustom21" style="color: green"># Data da 5º Entrega</label>
          <input type="text" class="form-control" name="5_MES" id="validationCustom21" value="{{ dados.5_MES }}" >
          <div class="invalid-feedback">
            Please provide a valid zip.
@@ -188,7 +188,7 @@
        </div>
 
 <div class="col-md-12">
-          <label for="validationCustom22">Data da 6º Entrega</label>
+          <label for="validationCustom22" style="color: green"># Data da 6º Entrega</label>
           <input type="text" class="form-control" name="6_MES" id="validationCustom22" value="{{ dados.6_MES }}" >
           <div class="invalid-feedback">
            Please provide a valid zip.
@@ -206,21 +206,21 @@
         </div>
 
 <div class="col-md-12">
-        <label for="validationCustom24">Data da 7º Entrega</label>
+        <label for="validationCustom24" style="color: green"># Data da 7º Entrega</label>
         <input type="text" class="form-control" name="7_MES" id="validationCustom24" value="{{ dados.7_MES }}" >
         <div class="invalid-feedback">
           Please provide a valid zip.
         </div>
       </div>
 <div class="col-md-12">
-          <label for="validationCustom25">Data da 8º Entrega</label>
+          <label for="validationCustom25" style="color: green"># Data da 8º Entrega</label>
           <input type="text" class="form-control" name="8_MES" id="validationCustom25" value="{{ dados.8_MES }}" >
           <div class="invalid-feedback">
             Please provide a valid zip.
         </div>
       </div>
 <div class="col-md-12">
-          <label for="validationCustom26">Data da 9º Entrega</label>
+          <label for="validationCustom26" style="color: green"># Data da 9º Entrega</label>
           <input type="text" class="form-control" name="9_MES" id="validationCustom26" value="{{ dados.9_MES }}" >
           <div class="invalid-feedback">
             Please provide a valid zip.
@@ -237,7 +237,7 @@
         </div>
       </div>
 <div class="col-md-12">
-        <label for="validationCustom28">Data da 10º Entrega</label>
+        <label for="validationCustom28" style="color: green"># Data da 10º Entrega</label>
         <input type="text" class="form-control" name="10_MES" id="validationCustom28" value="{{ dados.10_MES }}" >
         <div class="invalid-feedback">
           Please provide a valid zip.
@@ -245,7 +245,7 @@
       </div>
 
 <div class="col-md-12">
-         <label for="validationCustom29">Data da 11º Entrega</label>
+         <label for="validationCustom29" style="color: green"># Data da 11º Entrega</label>
          <input type="text" class="form-control" name="11_MES" id="validationCustom29" value="{{ dados.11_MES }}" >
          <div class="invalid-feedback">
            Please provide a valid zip.
@@ -253,7 +253,7 @@
        </div>
 
 <div class="col-md-12">
-          <label for="validationCustom30">Data da 12º Entrega</label>
+          <label for="validationCustom30" style="color: green"># Data da 12º Entrega</label>
           <input type="text" class="form-control" name="12_MES" id="validationCustom30" value="{{ dados.12_MES }}" >
           <div class="invalid-feedback">
            Please provide a valid zip.
@@ -289,7 +289,8 @@
       {% if not novo %}
         <a href="{% url 'beneficiarios:registrar_cesta' %}" class="btn btn-info">Adcionar Pessoa</a>
       {% endif %}
-      <a href="{% url 'core:home' %}" class="btn btn-danger">Voltar</a></center>
+        <input type="button" value="Voltar" class="btn btn-danger" onClick="history.go(-1)"></center>
+
 <br>
 </form>
 </div>
