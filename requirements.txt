@@ -10,6 +10,7 @@ django-heroku==0.3.1
 future==0.18.2
 google-auth==2.0.1
 google-auth-oauthlib==0.4.5
+gunicorn==19.0.0
 gspread==4.0.1
 html5lib==1.1
 httplib2==0.19.1
