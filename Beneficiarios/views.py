@@ -414,7 +414,7 @@ def relatorios(request):
     script, div = components(plt)
     context['script'] = script
     context['div'] = div
-    show(plt)
+    #show(plt)
 
     mensagem = "Em 2021 foram entregues {0} cestas básicas " \
                ". Em {1} foram {2} Cestas, " \
