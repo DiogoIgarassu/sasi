@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+
+        {% if mensagem %}
+
+        <h2>{{ mensagem }}</h2>
+
+        {% endif %}
+
+     {% if beneficiarios %}
+        <table border="1">
+        <tr>
+            <th>N</th>
+            <th>DATA</th>
+            <th>NOME</th>
+            <th>CPF</th>
+            <th>NIS</th>
+            <th>BAIRRO</th>
+            <th>ORIGEM</th>
+            <th>QUANTAS?</th>
+        </tr>
+        <ul>
+            {% for beneficiario in beneficiarios %}
+            <tr align="center">
+                    <td>{{ beneficiario.CONT }} </td>
+                    <td> {{ beneficiario.DATA }}</td>
+                    <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
+                    <td> {{ beneficiario.CPF }}</td>
+                    <td> {{ beneficiario.NIS }}</td>
+                    <td> {{ beneficiario.BAIRRO }} </td>
+                    <td> {{ beneficiario.ORIGEM }} </td>
+                    <td>{{ beneficiario.QUANTAS }} </td>
+            </tr>
+            {% endfor %}
+        </ul>
+        </table>
+        {% endif %}
+
+    </div>
+</div>
+<br><br>
+{% endblock %}

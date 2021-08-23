@@ -34,8 +34,8 @@ function handleInput(e) {
         <ul>
             {% if user.is_authenticated %}
             <li class="pure-menu-selected"><a href="{% url 'core:home' %}">Início</a></li>
-            <li><a href="{% url 'beneficiarios:lista_cestas' %}">Relatórios</a></li>
-            <li><a href="{% url 'beneficiarios:relatorios' %}">Painel</a></li>
+            <li><a href="{% url 'beneficiarios:lista_cestas' %}">Listas</a></li>
+            <li><a href="{% url 'beneficiarios:relatorios' %}">Relatórios</a></li>
             <li><a href="">( {{ user }} ) </a></li>
             <li><a href="{% url 'accounts:logout' %}">Sair</a></li>
             {% else %}

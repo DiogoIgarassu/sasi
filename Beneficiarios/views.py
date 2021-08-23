@@ -16,6 +16,11 @@ from bokeh.plotting import figure
 from bokeh.sampledata.autompg import autompg_clean as df
 from bokeh.transform import factor_cmap
 import calendar
+from reportlab.pdfgen import canvas
+from xhtml2pdf import pisa
+from Beneficiarios.utils import link_callback
+import django.template.loader
+
 
 scope = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/auth/drive"]
 creds = ServiceAccountCredentials.from_json_keyfile_name('secret_client.json', scope)
@@ -29,7 +34,12 @@ ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAI
 meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
          '9_MES', '10_MES', '11_MES', '12_MES']
 
+LISTA = ['CONT', 'DATA', 'NOME', 'CPF', 'NIS', 'BAIRRO', 'ORIGEM', 'QUANTAS']
+
 lista_beneficiarios = []
+mes = None
+ano = None
+mensagem_pdf = None
 
 
 def Conta_cestas(beneficiario):
@@ -99,6 +109,7 @@ def busca_cestas(request, cpf=None):
                 #busca = int(busca)
                 for dic in dados:
                     if busca == dic['CPF']:
+                        dic['CPF'] = dic['CPF'].replace('.', '').replace('-', '')
                         beneficiarios.append(dic)
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
             elif tipo_busca == 'NIS':
@@ -106,13 +117,14 @@ def busca_cestas(request, cpf=None):
                 #busca = busca.upper()
                 for dic in dados:
                     if int(busca) == int(dic['NIS']):
-                        print("aqui 2")
+                        dic['CPF'] = dic['CPF'].replace('.', '').replace('-', '')
                         beneficiarios.append(dic)
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
             elif tipo_busca == 'Nome':
                 busca = busca.upper()
                 for dic in dados:
                     if busca in dic['NOME']:
+                        dic['CPF'] = dic['CPF'].replace('.', '').replace('-', '')
                         beneficiarios.append(dic)
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
     except:
@@ -159,16 +171,18 @@ def beneficiario_details(request, pk):
 
     return render(request, template_name, {'beneficiario': beneficiarios, 'mensagem': mensagem})
 
+
 @login_required
 def beneficiario_register(request):
     #print('método: ', request.method)
     sheet = client.open('cesta_basica_emergencial').sheet1
     values_list = sheet.col_values(1)
     del(values_list[0])
-    values_list= list(map(int, values_list))
+
+    values_list = list(map(int, values_list))
     ult_id = max(values_list, key=int)
     novo_id = ult_id + 1
-    #pos_col = f'A{novo_id + 1}'
+
     beneficiarios = []
     dic = {}
     if request.method == 'POST':
@@ -195,7 +209,7 @@ def beneficiario_register(request):
 
 @login_required
 def lista_cestas(request):
-    global lista_beneficiarios
+    global lista_beneficiarios, mes, ano, mensagem_pdf
     context = {}
     status = request.GET.get('status', None)
     mes = request.GET.get('mes', None)
@@ -237,265 +251,152 @@ def lista_cestas(request):
                             #print(dic)
 
         mensagem = f'De {data_i.strftime("%d/%m/%Y")} até {data_f.strftime("%d/%m/%Y")} foram distribuídas {cont} cestas básicas'
+
     if beneficiarios:
         context['beneficiarios'] = beneficiarios
         lista_beneficiarios = beneficiarios
 
     if mensagem:
         context['mensagem'] = mensagem
+        mensagem_pdf = mensagem
 
     return render(request, template_name, context)
 
-def export_cestas(request, datai, dataf):
-    global lista_beneficiarios
-    response = HttpResponse(content_type='text/csv')
-    cont = 0
+
+def export_csv(request):
+    global lista_beneficiarios, mes, ano
+
+    response = HttpResponse(content_type='text/csv', charset="utf-8")
     writer = csv.writer(response)
-    writer.writerow(ORDEM)
+    writer.writerow(LISTA)
 
     for linha in lista_beneficiarios:
-        writer.writerow(linha)
+        row_dados = []
+        for i in LISTA:
+            if i in linha:
+                row_dados.append(linha[i])
+        writer.writerow(row_dados)
 
-    response['Content-Disposition'] = 'attachment; filename="cesta_basica.csv"'
+    file = f'cestas_basicas_mes_{mes}_ano_{ano}.csv'
+    response['Content-Disposition'] = f'attachment; filename={file}'
 
     return response
 
-dic_meses_eme = defaultdict(list)
-dic_meses_eve = defaultdict(list)
-dic_meses_total = defaultdict(list)
-dic_count = defaultdict(list)
 
-def conte_por_mes(mes, tipo):
-    global dic_meses_eme, dic_meses_eve, dic_meses_total, dic_count
+def export_pdf(request):
+    template_path = 'beneficiarios/export_pdf.html'
+    context = {'beneficiarios': lista_beneficiarios, 'mensagem': mensagem_pdf}
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    file = f'cestas_basicas_mes_{mes}_ano_{ano}.pdf'
+    response['Content-Disposition'] = f'attachment; filename={file}'
+    # find the template and render it.
+    template = django.template.loader.get_template(template_path)
+    html = template.render(context)
 
-    if tipo == 'eme':
-        dic_count = dic_meses_eme
-    elif tipo == 'eve':
-        dic_count = dic_meses_eve
-
-    if mes == 1:
-        if dic_count[1]:
-            cont1 = int(dic_count[1]) + 1
-            cont2 = int(dic_meses_total[1]) + 1
-            dic_count[1] = cont1
-            dic_meses_total[1] = cont2
-        else:
-            dic_count[1] = 1
-            if dic_meses_total[1]:
-                cont2 = int(dic_meses_total[1]) + 1
-                dic_meses_total[1] = cont2
-            else:
-                dic_meses_total[1] = 1
-    elif mes == 2:
-        if dic_count[2]:
-            cont1 = int(dic_count[2]) + 1
-            cont2 = int(dic_meses_total[2]) + 1
-            dic_count[2] = cont1
-            dic_meses_total[2] = cont2
-        else:
-            dic_count[2] = 1
-            if dic_meses_total[2]:
-                cont2 = int(dic_meses_total[2]) + 1
-                dic_meses_total[2] = cont2
-            else:
-                dic_meses_total[2] = 1
-    elif mes == 3:
-        if dic_count[3]:
-            cont1 = int(dic_count[3]) + 1
-            cont2 = int(dic_meses_total[3]) + 1
-            dic_count[3] = cont1
-            dic_meses_total[3] = cont2
-        else:
-            dic_count[3] = 1
-            if dic_meses_total[3]:
-                cont2 = int(dic_meses_total[3]) + 1
-                dic_meses_total[3] = cont2
-            else:
-                dic_meses_total[3] = 1
-    elif mes == 4:
-        if dic_count[4]:
-            cont1 = int(dic_count[4]) + 1
-            cont2 = int(dic_meses_total[4]) + 1
-            dic_count[4] = cont1
-            dic_meses_total[4] = cont2
-        else:
-            dic_count[4] = 1
-            if dic_meses_total[4]:
-                cont2 = int(dic_meses_total[4]) + 1
-                dic_meses_total[4] = cont2
-            else:
-                dic_meses_total[4] = 1
-    elif mes == 5:
-        if dic_count[5]:
-            cont1 = int(dic_count[5]) + 1
-            cont2 = int(dic_meses_total[5]) + 1
-            dic_count[5] = cont1
-            dic_meses_total[5] = cont2
-        else:
-            dic_count[5] = 1
-            if dic_meses_total[5]:
-                cont2 = int(dic_meses_total[5]) + 1
-                dic_meses_total[5] = cont2
-            else:
-                dic_meses_total[5] = 1
-    elif mes == 6:
-        if dic_count[6]:
-            cont1 = int(dic_count[6]) + 1
-            cont2 = int(dic_meses_total[6]) + 1
-            dic_count[6] = cont1
-            dic_meses_total[6] = cont2
-        else:
-            dic_count[6] = 1
-            if dic_meses_total[6]:
-                cont2 = int(dic_meses_total[6]) + 1
-                dic_meses_total[6] = cont2
-            else:
-                dic_meses_total[6] = 1
-    elif mes == 7:
-        if dic_count[7]:
-            cont1 = int(dic_count[7]) + 1
-            cont2 = int(dic_meses_total[7]) + 1
-            dic_count[7] = cont1
-            dic_meses_total[7] = cont2
-        else:
-            dic_count[7] = 1
-            if dic_meses_total[7]:
-                cont2 = int(dic_meses_total[7]) + 1
-                dic_meses_total[7] = cont2
-            else:
-                dic_meses_total[7] = 1
-    elif mes == 8:
-        if dic_count[8]:
-            cont1 = int(dic_count[8]) + 1
-            cont2 = int(dic_meses_total[8]) + 1
-            dic_count[8] = cont1
-            dic_meses_total[8] = cont2
-        else:
-            dic_count[8] = 1
-            if dic_meses_total[8]:
-                cont2 = int(dic_meses_total[8]) + 1
-                dic_meses_total[8] = cont2
-            else:
-                dic_meses_total[8] = 1
-    elif mes == 9:
-        if dic_count[9]:
-            cont1 = int(dic_count[9]) + 1
-            cont2 = int(dic_meses_total[9]) + 1
-            dic_count[9] = cont1
-            dic_meses_total[9] = cont2
-        else:
-            dic_count[9] = 1
-            if dic_meses_total[9]:
-                cont2 = int(dic_meses_total[9]) + 1
-                dic_meses_total[9] = cont2
-            else:
-                dic_meses_total[9] = 1
-    elif mes == 10:
-        if dic_count[10]:
-            cont1 = int(dic_count[10]) + 1
-            cont2 = int(dic_meses_total[10]) + 1
-            dic_count[10] = cont1
-            dic_meses_total[10] = cont2
-        else:
-            dic_count[10] = 1
-            if dic_meses_total[10]:
-                cont2 = int(dic_meses_total[10]) + 1
-                dic_meses_total[10] = cont2
-            else:
-                dic_meses_total[10] = 1
-    elif mes == 11:
-        if dic_count[1]:
-            cont1 = int(dic_count[1]) + 1
-            cont2 = int(dic_meses_total[11]) + 1
-            dic_count[11] = cont1
-            dic_meses_total[11] = cont2
-        else:
-            dic_count[11] = 1
-            if dic_meses_total[11]:
-                cont2 = int(dic_meses_total[11]) + 1
-                dic_meses_total[11] = cont2
-            else:
-                dic_meses_total[11] = 1
-    elif mes == 12:
-        if dic_count[12]:
-            cont1 = int(dic_count[12]) + 1
-            cont2 = int(dic_meses_total[12]) + 1
-            dic_count[12] = cont1
-            dic_meses_total[12] = cont2
-        else:
-            dic_count[12] = 1
-            if dic_meses_total[12]:
-                cont2 = int(dic_meses_total[12]) + 1
-                dic_meses_total[12] = cont2
-            else:
-                dic_meses_total[12] = 1
-
-    if tipo == 'eme':
-        dic_meses_eme = dic_count
-    elif tipo == 'eve':
-        dic_meses_eve = dic_count
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+       html, dest=response, link_callback=link_callback)
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
 
 
-    return dic_meses_eve, dic_meses_eme, dic_meses_total
+def conte_cestas():
+    dic_status = defaultdict(list)
+    dic_datas = defaultdict(list)
+    total = 0
+    PROX_CESTA = 0
+    proxs_beneficiarios = []
+    sheet = client.open('cesta_basica_emergencial').sheet1
+    dados = sheet.get_all_records()
+    for linha in dados: #PARA CADA LINHA DO ARQUIVO
+        total += 1
+        STATUS = linha['STATUS']
+        if dic_status[STATUS]: #CRIAR DICIONARIO DE STATUS
+            cont1 = int(dic_status[STATUS]) + 1
+            dic_status[STATUS] = cont1
+        else:
+            dic_status[STATUS] = 1
+        for col in linha: #PARA CADA COLUNA DA LINHA
+            if col in meses: #SE A COLUNA ESTA NA TABELA MESES
+                DATA = linha[col]
+                if '/' in DATA: #SE CAMPO ESTÁ PREENCHIDO
+                    DATAT = datetime.datetime.strptime(DATA, '%d/%m/%Y')
+                    MES_DATA = datetime.datetime.strftime(DATAT, "%B")
+                    ANO_DATA = datetime.datetime.strftime(DATAT, "%Y")
+                    ANO = datetime.datetime.strptime('2021', "%Y")
+                    ANO = datetime.datetime.strftime(ANO, "%Y")
+                    MES_DATA = str(MES_DATA)
+                    if ANO_DATA == ANO: #SE O ANO FOR 2021
+                        #print()
+                        if dic_datas[MES_DATA]: #CRIAR DICIONARIOS DE MESES
+                            dic_datas[MES_DATA].append(DATA)
+                        else:
+                            dic_datas[MES_DATA] = [DATA]
 
+        cont, ultima_data = Conta_cestas(linha)
+        p_cesta_date = datetime.datetime.strptime(ultima_data, '%d/%m/%Y')
+        #p_cesta_date = p_cesta_date.replace(day=1)
+        p_cesta_date = str(p_cesta_date.strftime("%B"))
+        today = datetime.date.today()
+        mes_atual = str(today.strftime("%B"))
+        p_cesta = linha['PROX_CESTA']
+        if "/" in p_cesta:
+            p_cesta = p_cesta.split("/")
+            if mes_atual == p_cesta_date:
+                if int(p_cesta[1]) == int(p_cesta[0]):
+                    PROX_CESTA += 1
+                    proxs_beneficiarios.append(linha)
+            if mes_atual != p_cesta_date:
+                    if int(p_cesta[1]) > int(p_cesta[0]):
+                        PROX_CESTA += 1
+                        proxs_beneficiarios.append(linha)
 
-
-
+    return total, dic_status, dic_datas, proxs_beneficiarios
 
 @login_required
 def relatorios(request):
-    sheet = client.open('cesta_basica_emergencial').sheet1
-    dados = sheet.get_all_records()
+    total, dic_status, dic_datas, proxs_beneficiarios = conte_cestas()
     template_name = 'beneficiarios/relatorios.html'
-    eventual_count = 0
-    emergencial_count = 0
-    total_count = 0
     context = {}
-    data_atual = datetime.date.today()
-    mes_atual = data_atual.month
+    today = datetime.date.today()
+    first = today.replace(day=1)
+    lastMonth = first - datetime.timedelta(days=1)
+    mes_passado = str(lastMonth.strftime("%B"))
+    mes_atual = str(first.strftime("%B"))
 
-    global dic_meses_total, dic_meses_eme, dic_meses_eve
-    dic_meses_total = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
-    dic_meses_eme = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
-    dic_meses_eve = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0}
+    context['total'] = total
+    context['total_ativos'] = dic_status['DEFERIDO']
+    context['total_finalizados'] = dic_status['FINALIZADO']
+    context['total_suspensos'] = dic_status['SUSPENSO']
+    context['total_indeferidos'] = dic_status['INDEFIRIDO']
+    context['total_emergenciais'] = dic_status['EMERGENCIAL']
+    context['proxs_beneficiarios'] = proxs_beneficiarios
 
-    for dic in dados:
-        data_benef = dic['DATA']
-        data_benef = datetime.datetime.strptime(data_benef, '%d/%m/%Y')
-        mes = data_benef.month
-        if 'EVENTUAL' == dic['TIPO']:
-            eventual_count += 1
-            total_count += 1
-            conte_por_mes(mes, 'eve')
-        elif 'EMERGENCIAL' == dic['TIPO']:
-            emergencial_count += 1
-            total_count += 1
-            conte_por_mes(mes, 'eme')
+    meses, qtd_mes = [], []
+    ordem_mes = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+                 'October', 'November', 'December']
+    for mes in ordem_mes:
+        if mes in dic_datas:
+            meses.append(mes)
+            qtd_mes.append(len(dic_datas[mes]))
 
-    '''print(dic_meses_total, 'Dicionario total')
-    print(dic_meses_eme, 'Dicionario emergencial')
-    print(dic_meses_eve, 'Dicionario eventual')'''
-    context['total'] = total_count
-    context['total_eme'] = emergencial_count
-    context['total_eve'] = eventual_count
-    mes_aterior = mes - 1
-    context['total_anterior'] = dic_meses_total[mes_aterior]
-    context['eme_anterior'] = dic_meses_eme[mes_aterior]
-    context['eve_anterior'] = dic_meses_eve[mes_aterior]
-    context['total_atual'] = dic_meses_total[mes]
-    context['eme_atual'] = dic_meses_eme[mes]
-    context['eve_atual'] = dic_meses_eve[mes]
+    context['total_2021'] = sum(qtd_mes)
+    context['total_mes_anterior'] = len(dic_datas[mes_passado])
+    context['total_esse_mes'] = len(dic_datas[mes_atual])
+    context['total_prox_mes'] = len(proxs_beneficiarios)
 
     # DEFININDO NOME DO EIXO X E Y
-    x_axis = 'Distruibuição de Cestas Básicas por mês em 2020.'
+    x_axis = 'Distruibuição de Cestas Básicas por mês em 2021.'
     y_axis = 'plotado por https://sasi-igarassu.herokuapp.com/'
 
     TOOLTIPS = [("Cidade", "@x"), ("Total", "@y")]
 
-    meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
 
     # DEFININDO AS CONFIGURAÇÕES DO GRÁFICO 1
-    plt = figure(x_range=meses, plot_width=800, plot_height=450, title="tipo",
+    plt = figure(x_range=meses, plot_width=800, plot_height=400, title="tipo",
                  toolbar_location="right", x_axis_label=x_axis,
                  y_axis_label=y_axis, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
                  tooltips=TOOLTIPS)
@@ -503,50 +404,26 @@ def relatorios(request):
     plt.xaxis.major_label_orientation = pi / 4
     plt.sizing_mode = 'scale_width'
 
-    lista_total = []
-    for mes in dic_meses_total:
-        lista_total.append(mes)
-    source = ColumnDataSource(data=dict(x=meses, y=lista_total))
+    source = ColumnDataSource(data=dict(x=meses, y=qtd_mes))
     plt.vbar('x', top='y', color="#ffba57", bottom=0, width=0.6, source=source)
-    plt.vbar('x', top='y', color="#ff5252", bottom=0, width=0.6, source=source)
-    plt.line(x=meses, y=lista_total, color='red', legend_label='MORTOS', line_width=3)
+    #plt.vbar('x', top='y', color="#ff5252", bottom=0, width=0.6, source=source)
+    plt.line(x=meses, y=qtd_mes, color='red', line_width=3)
 
     #print(meses)
     #print(lista_total)
     script, div = components(plt)
     context['script'] = script
     context['div'] = div
+    #show(plt)
 
-    plt2 = figure(x_range=['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ']
-                  , plot_width=800, plot_height=800, title="tipo",
-                 toolbar_location="right", x_axis_label=x_axis,
-                 y_axis_label=y_axis, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
-                 tooltips=TOOLTIPS)
-
-    plt2.line(x=['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'],
-              y=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], color='red', legend_label='MORTOS', line_width=3)
-
-
-
-
-    mensagem = "Em 2020 foram {0} Cestas eventuais e {1} cestas " \
-               "emergenciais. Em julho foram {2} Cestas, " \
-               "no mês atual foram até o momento {3}".format(eventual_count, emergencial_count,
-                                                             dic_meses_total[7], dic_meses_total[mes_atual])
+    mensagem = "Em 2021 foram entregues {0} cestas básicas " \
+               ". Em {1} foram {2} Cestas, " \
+               "no mês atual foram até o momento {3} cestas.".format(context['total_2021'], mes_passado,
+                                                             context['total_mes_anterior'], context['total_prox_mes'])
 
     context['mensagem'] = mensagem
 
 
-    # create some example data
-    output_file('vbar.html')
-
-    p = figure(plot_width=400, plot_height=400)
-    p.vbar(x=[1, 2, 3], width=0.5, bottom=0,
-           top=[1.2, 2.5, 3.7], color="firebrick")
-    script2, div2 = components(p)
-    show(p)
-    context['script2'] = script2
-    context['div2'] = div2
     return render(request, template_name, context)
 
 

@@ -2,8 +2,9 @@
 {% load static %}
 
 {% block content %}
+
   {{script | safe}}
-  {{script2 | safe}}
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.0.1.min.js"></script>
 <style type="text/css">
 body, html{
   height: 100%;
@@ -32,30 +33,67 @@ body, html{
 <div class="pure-g-r content-ribbon">
 
     <div class="pure-u-1">
-        <p>.</p>
+
         <h2>Painel informativo do SASI</h2>
 
+        {% if mensagem %}
 
-        <p><b>TOTAL DE CESTAS BÁSICAS ENTREGUES EM 2020: {{ total }}</b></p>
-            <li>Cestas Eventuais entregues em 2020:<b> {{ total_eve }}</b></li>
-            <li>Cestas Emergenciais entregues em 2020:<b> {{ total_eme }}</b></li>
-        <p><b>TOTAL DE CESTAS BÁSICAS ENTREGUES NO MÊS ANTERIOR: {{ total_anterior }}</b></p>
-            <li>Cestas Eventuais entregues no mês anterior:<b> {{ eve_anterior }}</b></li>
-            <li>Cestas Emergenciais entregues no mês anterior:<b> {{ eme_anterior }}</b></li>
+        <p>{{ mensagem }}</p>
 
-        {{div2 | safe}}
-        <div class="div1">
+        {% endif %}
+        <ul>
+        <p><b>TOTAL DE SOLICITAÇÕES ANALISADAS EM 2021: * {{ total }} casos</b></p>
+            <li>Total de Beneficiários ativos:<b> {{ total_ativos }}</b></li>
+            <li>Total de Beneficiários emergenciais:<b> {{ total_emergenciais }}</b></li>
+            <li>Total de Beneficiários finalizados:<b> {{ total_finalizados }}</b></li>
+            <li>Total de Beneficiários indeferidos:<b> {{ total_indeferidos }}</b></li>
+            <li>Total de Beneficiários suspensos:<b> {{ total_suspensos }}</b></li>
+
+        <p><b>TOTAL DE CESTAS BÁSICAS ENTREGUES EM 2021: * {{ total_2021 }} Cestas</b></p>
+            <li>Total de cestas entregues no mês passado:<b> {{ total_mes_anterior }}</b></li>
+            <li>Total de cestas entregues este mês até o momento:<b> {{ total_esse_mes }}</b></li>
+            <li>Total de cestas agendadas para entrega próximo mês:<b> {{ total_prox_mes }}</b></li>
+        </ul>
+    <div class="row justify-content-center">
+        <div class="col-sm-11 sm-1" >
         {{div | safe}}
-        </div>
-
-        <p><b>TOTAL DE CESTAS BÁSICAS ENTREGUES NESTE MÊS: {{ total_atual }}</b></p>
-            <li>Cestas Eventuais entregues neste mês:<b> {{ eve_atual }}</b></li>
-            <li>Cestas Emergenciais entregues neste mês:<b> {{ eme_atual }}</b></li>
-
-
+        </div></div>
 
     </div>
 </div>
 <div class="div2"> {{div | safe}}</div>
 
+{% if proxs_beneficiarios %}
+    <div class="row justify-content-center">
+        <div class="col-sm-11 sm-1" >
+    <p> Listas dos {{ total_prox_mes }} Beneficiários sinalizados para receber próximo mês</p>
+        <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>PROX_ENTREGA</th>
+            <th>NOME</th>
+            <th>CPF</th>
+            <th>NIS</th>
+            <th>BAIRRO</th>
+            <th>ORIGEM</th>
+            <th>À_RECEBER</th>
+        </tr>
+        <ul>
+            {% for beneficiario in proxs_beneficiarios %}
+            <tr align="center">
+                    <td>{{ beneficiario.N }} </td>
+                    <td> {{ beneficiario.PROX_ENTREGA }}</td>
+                    <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
+                    <td> {{ beneficiario.CPF }}</td>
+                    <td> {{ beneficiario.NIS }}</td>
+                    <td> {{ beneficiario.BAIRRO }} </td>
+                    <td> {{ beneficiario.ORIGEM }} </td>
+                    <td>{{ beneficiario.PROX_CESTA }} </td>
+            </tr>
+            {% endfor %}
+        </ul>
+        </table>
+        </div></div>
+        {% endif %}
+<br>
 {% endblock %}

@@ -47,16 +47,17 @@
                 <option value="2022">2022</option>
              </select>
                  </div></div>
-         <div class="col-sm-2 sm-2" >
+         <div class="col-sm-6 sm-6" >
            <div class="col-md-12">
-                <button type="submit" class="pure-button pure-button-hope">Buscar</button>
-                 {% if beneficiarios %}
-                    <a href="{% url 'beneficiarios:export_cestas'%}" class="pure-button pure-button-danger">Exportar CSV</a>
-                 {% endif%}
+                <button type="submit" class="btn btn-success">Buscar</button>
+            {% if beneficiarios %}
+                <a href="{% url 'beneficiarios:export_csv'%}" class="btn btn-warning">Exportar CSV</a>
+                <a href="{% url 'beneficiarios:export_pdf'%}" class="btn btn-danger">Exportar PDF</a>
+             {% endif%}
              </div>
     </div> </div>
+
         </form>
-        <br>
 
         {% if mensagem %}
 
