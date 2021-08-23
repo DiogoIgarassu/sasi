@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'Beneficiarios',
 ]
 
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
