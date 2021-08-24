@@ -54,7 +54,7 @@ def Conta_cestas(beneficiario):
             if mes == key and '/' in beneficiario[key]:
                 conta += 1
                 ultima_data = beneficiario[key]
-
+                #print(mes, key, ultima_data)
     return conta, ultima_data
 
 @login_required
@@ -152,7 +152,7 @@ def beneficiario_details(request, pk):
             for key in updados:
                 if key == item:
                     uplist.append(updados[key])
-        sheet.update(f'{address}:AD56', [uplist])
+        sheet.update(f'{address}:AD{cell.row}', [uplist])
         messages.success(request, 'Cadastro alterado com sucesso')
         return redirect('beneficiarios:busca_cestas')
     try:
@@ -175,6 +175,7 @@ def beneficiario_register(request):
     #print('método: ', request.method)
     sheet = client.open('cesta_basica_emergencial').sheet1
     values_list = sheet.col_values(1)
+    #print(values_list)
     del(values_list[0])
 
     values_list = list(map(int, values_list))
@@ -192,7 +193,7 @@ def beneficiario_register(request):
                 if key == item:
                     uplist.append(updados[key])
 
-        sheet.update(f'A{novo_id+1}:AD56', [uplist])
+        sheet.update(f'A{novo_id+1}:AD{novo_id+1}', [uplist])
         messages.success(request, 'Usuário cadastrado com sucesso')
         return redirect('beneficiarios:busca_cestas')
     for key in ORDEM:
