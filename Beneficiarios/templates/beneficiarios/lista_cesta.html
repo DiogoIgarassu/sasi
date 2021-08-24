@@ -15,6 +15,7 @@
         <div class="col-sm-2 sm-2" >
             <div class="col-md-12">
                  <select name="status">
+                     <option value="TODOS">TODOS</option>
                     <option value="DEFERIDO">DEFERIDO</option>
                     <option value="INDEFERIDO">INDEFERIDO</option>
                     <option value="FINALIZADO">FINALIZADO</option>
@@ -61,7 +62,7 @@
 
         {% if mensagem %}
 
-        <br><p>{{ mensagem }}</p>
+        <br><b><p>{{ mensagem }}</p></b>
 
         {% endif %}
 
@@ -69,6 +70,7 @@
         <table border="1">
         <tr>
             <th>N</th>
+            <th>STATUS</th>
             <th>DATA</th>
             <th>NOME</th>
             <th>CPF</th>
@@ -81,6 +83,18 @@
             {% for beneficiario in beneficiarios %}
             <tr align="center">
                     <td>{{ beneficiario.CONT }} </td>
+                    <td>{% if beneficiario.STATUS == 'DEFERIDO' %}
+                            <p style="color:green;font-weight: bold;">
+                        {% elif beneficiario.STATUS == 'FINALIZADO' %}
+                            <p style="color:orange;font-weight: bold;">
+                        {% elif beneficiario.STATUS == 'EMERGENCIAL' %}
+                            <p style="color:teal;font-weight: bold;">
+                        {% elif beneficiario.STATUS == 'SUSPENSO' %}
+                            <p style="color:olive;font-weight: bold;">
+                        {% else %}
+                            <p style="color:red;font-weight: bold;">
+                    {% endif %}
+                            {{ beneficiario.STATUS }}</p> </td>
                     <td> {{ beneficiario.DATA }}</td>
                     <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
                     <td> {{ beneficiario.CPF }}</td>

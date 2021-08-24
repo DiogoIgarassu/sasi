@@ -1,3 +1,5 @@
+import codecs
+
 from django.shortcuts import render, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -20,6 +22,7 @@ from reportlab.pdfgen import canvas
 from xhtml2pdf import pisa
 from Beneficiarios.utils import link_callback
 import django.template.loader
+from io import BytesIO
 
 
 scope = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/auth/drive"]
@@ -34,7 +37,7 @@ ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAI
 meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
          '9_MES', '10_MES', '11_MES', '12_MES']
 
-LISTA = ['CONT', 'DATA', 'NOME', 'CPF', 'NIS', 'BAIRRO', 'ORIGEM', 'QUANTAS']
+LISTA = ['CONT', 'STATUS', 'DATA', 'NOME', 'CPF', 'NIS', 'BAIRRO', 'ORIGEM', 'QUANTAS']
 
 lista_beneficiarios = []
 mes = None
@@ -102,35 +105,30 @@ def busca_cestas(request, cpf=None):
 
     try:
         if tipo_busca:
-            print(tipo_busca)
+            #print(tipo_busca)
             sheet = client.open('cesta_basica_emergencial').sheet1
             dados = sheet.get_all_records()
             if tipo_busca == 'CPF':
                 #busca = int(busca)
                 for dic in dados:
                     if busca == dic['CPF']:
-                        dic['CPF'] = dic['CPF'].replace('.', '').replace('-', '')
                         beneficiarios.append(dic)
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
             elif tipo_busca == 'NIS':
-                print("aqui 1", busca)
-                #busca = busca.upper()
                 for dic in dados:
-                    if int(busca) == int(dic['NIS']):
-                        dic['CPF'] = dic['CPF'].replace('.', '').replace('-', '')
+                    if str(busca) == str(dic['NIS']):
                         beneficiarios.append(dic)
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
             elif tipo_busca == 'Nome':
                 busca = busca.upper()
                 for dic in dados:
                     if busca in dic['NOME']:
-                        dic['CPF'] = dic['CPF'].replace('.', '').replace('-', '')
                         beneficiarios.append(dic)
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
+        if len(beneficiarios) == 0:
+            mensagem = "Nenhum beneficiário encontrato."
     except:
-        mensagem = "Dados inválidos."
-    if len(beneficiarios) == 0:
-        mensagem = "Nenhum beneficiário encontrato."
+        mensagem = "Ocorreu um erro interno, por favor entre em contato com o administrador"
 
     return render(request, 'beneficiarios/busca_cestas.html', {'beneficiarios': beneficiarios, 'mensagem': mensagem, 'unique':unique})
 
@@ -213,7 +211,6 @@ def lista_cestas(request):
     context = {}
     status = request.GET.get('status', None)
     mes = request.GET.get('mes', None)
-    #print(mes)
     ano = request.GET.get('ano', None)
     mensagem = False
     beneficiarios = None
@@ -239,16 +236,16 @@ def lista_cestas(request):
 
             for date in date_generated:
                 for dic in dados:
-                    data = date.strftime("%d/%m/%Y")
-                    for m in meses:
-                        if data == dic[m]:
-                            cont += 1
-                            dic['CONT'] = cont
-                            dic['DATA'] = data
-                            dic['QUANTAS'] = f'{m[0]}º MÊS'
-                            dic['CPF'] = dic['CPF'].replace('.', '').replace('-', '')
-                            beneficiarios.append(dic)
-                            #print(dic)
+                    if dic['STATUS'] == status or status == 'TODOS':
+                        data = date.strftime("%d/%m/%Y")
+                        for m in meses:
+                            if data == dic[m]:
+                                cont += 1
+                                dic['CONT'] = cont
+                                dic['DATA'] = data
+                                dic['QUANTAS'] = f'{m[0]}º MÊS'
+                                beneficiarios.append(dic)
+                                #print(dic)
 
         mensagem = f'De {data_i.strftime("%d/%m/%Y")} até {data_f.strftime("%d/%m/%Y")} foram distribuídas {cont} cestas básicas'
 
@@ -266,7 +263,8 @@ def lista_cestas(request):
 def export_csv(request):
     global lista_beneficiarios, mes, ano
 
-    response = HttpResponse(content_type='text/csv', charset="utf-8")
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response.write(codecs.BOM_UTF8)
     writer = csv.writer(response)
     writer.writerow(LISTA)
 

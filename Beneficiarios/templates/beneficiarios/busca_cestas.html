@@ -44,6 +44,7 @@
         <table border="1">
         <tr>
             <th>ID</th>
+            <th>STATUS</th>
             <th>DATA</th>
             <th>CPF</th>
             <th>NIS</th>
@@ -57,6 +58,18 @@
             {% for beneficiario in beneficiarios %}
             <tr align="center">
                     <td>{{ beneficiario.N }} </td>
+                    <td>{% if beneficiario.STATUS == 'DEFERIDO' %}
+                            <p style="color:green;font-weight: bold;">
+                        {% elif beneficiario.STATUS == 'FINALIZADO' %}
+                            <p style="color:orange;font-weight: bold;">
+                        {% elif beneficiario.STATUS == 'EMERGENCIAL' %}
+                            <p style="color:teal;font-weight: bold;">
+                        {% elif beneficiario.STATUS == 'SUSPENSO' %}
+                            <p style="color:olive;font-weight: bold;">
+                        {% else %}
+                            <p style="color:red;font-weight: bold;">
+
+                    {% endif %}{{ beneficiario.STATUS }}</p> </td>
                     <td> {{ beneficiario.ULT_CESTA }}</td>
                     <td> {{ beneficiario.CPF }}</td>
                     <td> {{ beneficiario.NIS }}</td>
