@@ -51,7 +51,6 @@
             <th>NOME</th>
             <th>ENDEREÇO</th>
             <th>ORIGEM</th>
-            <th>STATUS</th>
             <th>RECEBIDAS</th>
         </tr>
         <ul>
@@ -76,7 +75,6 @@
                 <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
                     <td> {{ beneficiario.ENDERECO }} </td>
                     <td> {{ beneficiario.ORIGEM }} </td>
-                    <td>{{ beneficiario.STATUS }} </td>
                     <td>{{ beneficiario.QTAS_CESTAS}} </td>
             </tr>
             {% endfor %}
