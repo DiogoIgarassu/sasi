@@ -39,10 +39,35 @@ meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
 
 LISTA = ['CONT', 'STATUS', 'DATA', 'NOME', 'CPF', 'NIS', 'BAIRRO', 'ORIGEM', 'QUANTAS']
 
+mes_english = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
+               'October', 'November', 'December']
+
+mes_port = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO',
+               'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
+
+TODAY = datetime.date.today()
+MES_ATUAL = str(TODAY.strftime("%B"))
+MES_ATUAL_INDEX = mes_english.index(MES_ATUAL)
+PROX_MES = mes_port[MES_ATUAL_INDEX + 1]
+first = TODAY.replace(day=1)
+lastMonth = first - datetime.timedelta(days=1)
+MES_PASSADO = str(lastMonth.strftime("%B"))
+
 lista_beneficiarios = []
 mes = None
 ano = None
 mensagem_pdf = None
+
+def traduzir(mes):
+    if mes in mes_english:
+        id = mes_english.index(mes)
+        mes_traduzido = mes_port[id]
+    elif mes in mes_port:
+        id = mes_port.index(mes)
+        mes_traduzido = mes_english[id]
+    else:
+        mes_traduzido = 'ERRO'
+    return mes_traduzido
 
 
 def Conta_cestas(beneficiario):
@@ -329,29 +354,35 @@ def conte_cestas():
                     ANO = datetime.datetime.strftime(ANO, "%Y")
                     MES_DATA = str(MES_DATA)
                     if ANO_DATA == ANO: #SE O ANO FOR 2021
-                        #print()
+                        MES_DATA = traduzir(MES_DATA)
                         if dic_datas[MES_DATA]: #CRIAR DICIONARIOS DE MESES
                             dic_datas[MES_DATA].append(DATA)
                         else:
                             dic_datas[MES_DATA] = [DATA]
 
         cont, ultima_data = Conta_cestas(linha)
-        p_cesta_date = datetime.datetime.strptime(ultima_data, '%d/%m/%Y')
-        #p_cesta_date = p_cesta_date.replace(day=1)
-        p_cesta_date = str(p_cesta_date.strftime("%B"))
-        today = datetime.date.today()
-        mes_atual = str(today.strftime("%B"))
         p_cesta = linha['PROX_CESTA']
-        if "/" in p_cesta:
-            p_cesta = p_cesta.split("/")
-            if mes_atual == p_cesta_date:
-                if int(p_cesta[1]) == int(p_cesta[0]):
-                    PROX_CESTA += 1
-                    proxs_beneficiarios.append(linha)
-            if mes_atual != p_cesta_date:
-                    if int(p_cesta[1]) > int(p_cesta[0]):
+        data_solicitacao = linha['DATA_SOLICITACAO']
+        if ultima_data and PROX_MES:
+            p_cesta_date = datetime.datetime.strptime(ultima_data, '%d/%m/%Y')
+            p_cesta_date = str(p_cesta_date.strftime("%B"))
+            today = datetime.date.today()
+            mes_atual = str(today.strftime("%B"))
+            if "/" in p_cesta:
+                p_cesta = p_cesta.split("/")
+                if mes_atual == p_cesta_date:
+                    if int(p_cesta[1]) == int(p_cesta[0]):
                         PROX_CESTA += 1
                         proxs_beneficiarios.append(linha)
+                if MES_ATUAL != p_cesta_date:
+                        if int(p_cesta[1]) > int(p_cesta[0]):
+                            PROX_CESTA += 1
+                            proxs_beneficiarios.append(linha)
+        else:
+            if "/" in p_cesta and "/" in data_solicitacao:
+                PROX_CESTA += 1
+                proxs_beneficiarios.append(linha)
+
 
     return total, dic_status, dic_datas, proxs_beneficiarios
 
@@ -364,20 +395,21 @@ def relatorios(request):
     first = today.replace(day=1)
     lastMonth = first - datetime.timedelta(days=1)
     mes_passado = str(lastMonth.strftime("%B"))
+    mes_passado = traduzir(mes_passado)
     mes_atual = str(first.strftime("%B"))
+    mes_atual = traduzir(mes_atual)
 
     context['total'] = total
     context['total_ativos'] = dic_status['DEFERIDO']
     context['total_finalizados'] = dic_status['FINALIZADO']
     context['total_suspensos'] = dic_status['SUSPENSO']
-    context['total_indeferidos'] = dic_status['INDEFIRIDO']
+    context['total_indeferidos'] = dic_status['INDEFERIDO']
     context['total_emergenciais'] = dic_status['EMERGENCIAL']
     context['proxs_beneficiarios'] = proxs_beneficiarios
 
     meses, qtd_mes = [], []
-    ordem_mes = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
-                 'October', 'November', 'December']
-    for mes in ordem_mes:
+
+    for mes in mes_port:
         if mes in dic_datas:
             meses.append(mes)
             qtd_mes.append(len(dic_datas[mes]))
