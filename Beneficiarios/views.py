@@ -1,5 +1,5 @@
 import codecs
-
+from .models import *
 from django.shortcuts import render, redirect
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -24,15 +24,17 @@ from Beneficiarios.utils import link_callback
 import django.template.loader
 from io import BytesIO
 
+#from django.contrib.sessions.models import Session
+#Session.objects.all().delete()
 
 scope = ["https://spreadsheets.google.com/feeds","https://www.googleapis.com/auth/drive"]
 creds = ServiceAccountCredentials.from_json_keyfile_name('secret_client.json', scope)
 client = gspread.authorize(creds)
 
-ORDEM = ['N', 'STATUS', 'NOME', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'DATA_SOLICITACAO',
-         'ORIGEM', 'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES', '3_MES', '1A_RENOVACAO',
-         '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
-         '10_MES', '11_MES', '12_MES', 'OBSERVACOES']
+ORDEM = ['N', 'STATUS', 'NOME', 'NASCIMENTO', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'LOCALIDADE',
+         'DATA_SOLICITACAO', 'ORIGEM', 'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES', '3_MES',
+         '1A_RENOVACAO', '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
+         '10_MES', '11_MES', '12_MES', 'OBSERVACOES', 'ESCOLARIDADE', 'CURSO',]
 
 meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
          '9_MES', '10_MES', '11_MES', '12_MES']
@@ -160,7 +162,21 @@ def busca_cestas(request, cpf=None):
 
 @login_required
 def beneficiario_details(request, pk):
-    #print('método: ', request.method)
+
+    status = Status.objects.all()
+    escolaridade = Escolaridade.objects.all()
+    cursos = Curso.objects.all()
+    unidades = UnidadeSuas.objects.all()
+    esc, cur, uni, sta = [], [], [], []
+    for e in escolaridade:
+        esc.append(e.nivel)
+    for c in cursos:
+        cur.append(c.curso)
+    for u in unidades:
+        uni.append(u.unidade)
+    for s in status:
+        sta.append(s.status)
+
     sheet = client.open('cesta_basica_emergencial').sheet1
     pks = str(pk)
     cell = sheet.find(pks, None, in_column=1)
@@ -177,7 +193,7 @@ def beneficiario_details(request, pk):
             for key in updados:
                 if key == item:
                     uplist.append(updados[key])
-        sheet.update(f'{address}:AD{cell.row}', [uplist])
+        sheet.update(f'{address}:AH{cell.row}', [uplist])
         messages.success(request, 'Cadastro alterado com sucesso')
         return redirect('beneficiarios:busca_cestas')
     try:
@@ -192,12 +208,28 @@ def beneficiario_details(request, pk):
 
     template_name = 'beneficiarios/beneficiario_details.html'
 
-    return render(request, template_name, {'beneficiario': beneficiarios, 'mensagem': mensagem})
+    return render(request, template_name, {'beneficiario': beneficiarios, 'mensagem': mensagem,
+                                           'escolaridades': esc, 'cursos': cur, 'unidades': uni,
+                                           'status': sta})
 
 
 @login_required
 def beneficiario_register(request):
-    #print('método: ', request.method)
+
+    status = Status.objects.all()
+    escolaridade = Escolaridade.objects.all()
+    cursos = Curso.objects.all()
+    unidades = UnidadeSuas.objects.all()
+    esc, cur, uni, sta = [], [], [], []
+    for e in escolaridade:
+        esc.append(e.nivel)
+    for c in cursos:
+        cur.append(c.curso)
+    for u in unidades:
+        uni.append(u.unidade)
+    for s in status:
+        sta.append(s.status)
+
     sheet = client.open('cesta_basica_emergencial').sheet1
     values_list = sheet.col_values(1)
     #print(values_list)
@@ -218,7 +250,7 @@ def beneficiario_register(request):
                 if key == item:
                     uplist.append(updados[key])
 
-        sheet.update(f'A{novo_id+1}:AD{novo_id+1}', [uplist])
+        sheet.update(f'A{novo_id+1}:AH{novo_id+1}', [uplist])
         messages.success(request, 'Usuário cadastrado com sucesso')
         return redirect('beneficiarios:busca_cestas')
     for key in ORDEM:
@@ -226,9 +258,11 @@ def beneficiario_register(request):
     dic['N'] = novo_id
     beneficiarios.append(dic)
     novo_cadastro = True
+    #template_name = 'beneficiarios/beneficiario_details.html'
     template_name = 'beneficiarios/beneficiario_details.html'
-
-    return render(request, template_name, {'beneficiario': beneficiarios, 'novo': novo_cadastro})
+    return render(request, template_name, {'beneficiario': beneficiarios, 'novo': novo_cadastro,
+                                           'escolaridades': esc, 'cursos': cur, 'unidades': uni,
+                                           'status': sta})
 
 
 @login_required
