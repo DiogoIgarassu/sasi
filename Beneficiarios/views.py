@@ -23,7 +23,7 @@ from xhtml2pdf import pisa
 from Beneficiarios.utils import link_callback
 import django.template.loader
 from io import BytesIO
-
+import time
 #from django.contrib.sessions.models import Session
 #Session.objects.all().delete()
 
@@ -34,7 +34,7 @@ client = gspread.authorize(creds)
 ORDEM = ['N', 'STATUS', 'NOME', 'NASCIMENTO', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'LOCALIDADE',
          'DATA_SOLICITACAO', 'ORIGEM', 'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES', '3_MES',
          '1A_RENOVACAO', '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
-         '10_MES', '11_MES', '12_MES', 'OBSERVACOES', 'ESCOLARIDADE', 'CURSO',]
+         '10_MES', '11_MES', '12_MES', 'OBSERVACOES', 'ESCOLARIDADE', 'CURSO', 'ULTIMA_ATUALIZACAO']
 
 meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
          '9_MES', '10_MES', '11_MES', '12_MES']
@@ -186,14 +186,30 @@ def beneficiario_details(request, pk):
     dados = sheet.get_all_records()
     beneficiarios = []
     if request.method == 'POST':
+        historico = client.open('cesta_basica_emergencial').worksheet("historico")
+        values_list = historico.col_values(1)
+        del (values_list[0])
+        values_list = list(map(int, values_list))
+        ult_id = max(values_list, key=int)
+        novo_id = ult_id + 1
+
+        user = request.user
+        data1 = time.strftime('%d/%m/%Y', time.localtime())
+        hora1 = time.strftime('%H:%M:%S', time.localtime())
+        atualizacao = f'{hora1} de {data1} por {user}'
+
         updados = dict(request.POST.items())
         #print(updados)
         uplist = []
         for item in ORDEM:
             for key in updados:
                 if key == item:
+                    if key == 'ULTIMA_ATUALIZACAO':
+                        updados[key] = atualizacao
+                        historico.update(f'A{novo_id}:C{novo_id}', [[str(novo_id), pks, atualizacao]])
                     uplist.append(updados[key])
-        sheet.update(f'{address}:AH{cell.row}', [uplist])
+
+        sheet.update(f'{address}:AI{cell.row}', [uplist])
         messages.success(request, 'Cadastro alterado com sucesso')
         return redirect('beneficiarios:busca_cestas')
     try:
@@ -242,17 +258,34 @@ def beneficiario_register(request):
     beneficiarios = []
     dic = {}
     if request.method == 'POST':
+
+        historico = client.open('cesta_basica_emergencial').worksheet("historico")
+        values_list2 = historico.col_values(1)
+        del (values_list2[0])
+        values_list2 = list(map(int, values_list2))
+        ult_id2 = max(values_list2, key=int)
+        novo_id2 = ult_id2 + 1
+
+        user = request.user
+        data1 = time.strftime('%d/%m/%Y', time.localtime())
+        hora1 = time.strftime('%H:%M:%S', time.localtime())
+        atualizacao = f'{hora1} de {data1} por {user}'
+
         updados = dict(request.POST.items())
         uplist = []
         updados['N'] = novo_id
         for item in ORDEM:
             for key in updados:
                 if key == item:
+                    if key == 'ULTIMA_ATUALIZACAO':
+                        updados[key] = atualizacao
+                        historico.update(f'A{novo_id2}:C{novo_id2}', [[str(novo_id2), novo_id, atualizacao]])
                     uplist.append(updados[key])
 
-        sheet.update(f'A{novo_id+1}:AH{novo_id+1}', [uplist])
+        sheet.update(f'A{novo_id+1}:AI{novo_id+1}', [uplist])
         messages.success(request, 'Usuário cadastrado com sucesso')
         return redirect('beneficiarios:busca_cestas')
+
     for key in ORDEM:
         dic[key] = ''
     dic['N'] = novo_id
@@ -260,6 +293,7 @@ def beneficiario_register(request):
     novo_cadastro = True
     #template_name = 'beneficiarios/beneficiario_details.html'
     template_name = 'beneficiarios/beneficiario_details.html'
+
     return render(request, template_name, {'beneficiario': beneficiarios, 'novo': novo_cadastro,
                                            'escolaridades': esc, 'cursos': cur, 'unidades': uni,
                                            'status': sta})
@@ -490,5 +524,4 @@ def relatorios(request):
 
 
     return render(request, template_name, context)
-
 

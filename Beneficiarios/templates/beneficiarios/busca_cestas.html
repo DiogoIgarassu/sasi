@@ -3,6 +3,9 @@
 
 {% block content %}
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js">
+</script>
 
 <div class="pure-g-r content-ribbon">
 <!--
@@ -22,16 +25,17 @@
             <h3>Busque pelo CPF, NIS ou Nome do Usuário</h3>
             <form class="pure-form pure-form-stacked">
                 {% csrf_token %}
-             <select name="tipo_busca" style="width:100px;">
+             <select name="tipo_busca" style="width:100px;" id="select">
                 <option value="Nome">NOME</option>
                 <option value="CPF">CPF</option>
                 <option value="NIS">NIS</option>
              </select>
-             <input type="text" oninput="handleInput(event)" name="busca" maxlength="100" placeholder="DIGITE AQUI">
+             <input type="text" id="busca" oninput="handleInput(event)" onchange="aplicaMascara(this.value)" name="busca" maxlength="100" placeholder="DIGITE AQUI">
                  <div class="pure-controls">
                      <a href="{% url 'beneficiarios:busca_cestas' %}"><button class="btn btn-success">Buscar</button></a>
                      <a href="{% url 'beneficiarios:registrar_cesta' %}"  class="btn btn-info">Adcionar Beneficiário </a>
                  </div>
+
             </form>
 
         {% endif %}
@@ -83,5 +87,21 @@
         {% endif %}
     </div>
 </div>
+<script>
+$("#select").change(function() {
+  addMaskToInput();
+});
 
+function addMaskToInput() {
+  var $select = $('#select option:selected').val();
+  var $busca = $('#busca');
+  if ($select == "CPF") {
+    $busca.mask('999.999.999-99');
+  } else if ($select == "NIS") {
+    $busca.mask('99999999999');
+  } else {
+    $busca.unmask();
+  }
+}
+</script>
 {% endblock %}
