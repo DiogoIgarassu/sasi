@@ -4,6 +4,8 @@
 {% block content %}
 
   {{script | safe}}
+ {{script2 | safe}}
+ {{script3 | safe}}
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.3.min.js"></script>
 <style type="text/css">
 body, html{
@@ -30,70 +32,112 @@ body, html{
 }
 </style>
 
-<div class="pure-g-r content-ribbon">
+<div class="content" style="background-color: #F0FFFF;">
+    <div class="pure-g-r content-ribbon">
 
-    <div class="pure-u-1">
-
-        <h2>Painel informativo do SASI</h2>
-
+        <div class="card text-white bg-primary">
+            <div class="card-header" style="font-size:20px; font-weight: bold;">Painel informativo do SASI</div>
+        </div>
         {% if mensagem %}
 
         <p>{{ mensagem }}</p>
 
         {% endif %}
         <ul>
-        <p><b>TOTAL DE SOLICITAÇÕES ANALISADAS EM 2021: * {{ total }} casos</b></p>
-            <li>Total de Beneficiários ativos:<b> {{ total_ativos }}</b></li>
-            <li>Total de Beneficiários emergenciais:<b> {{ total_emergenciais }}</b></li>
-            <li>Total de Beneficiários finalizados:<b> {{ total_finalizados }}</b></li>
-            <li>Total de Beneficiários indeferidos:<b> {{ total_indeferidos }}</b></li>
-            <li>Total de Beneficiários suspensos:<b> {{ total_suspensos }}</b></li>
+            <li><b>TOTAL DE REGISTROS DE SOLICITAÇÕES ANALISADAS: * {{ total_registros }} casos</b></li>
+            <li><b>TOTAL DE BENEFICIÁRIOS CONTEMPLADOS EM 2021: * {{ total_ano }} Beneficiários</b></li>
+            <li>Total de Beneficiários ATIVOS:<b> {{ total_ativos }}</b></li>
+            <li>Total de Beneficiários EMERGENCIAIS:<b> {% if total_emergenciais %} {{ total_emergenciais }} {% else %} 0 {% endif %}</b></li>
+            <li>Total de Beneficiários FINALIZADOS:<b> {{ total_finalizados }}</b></li>
+            <li>Total de Beneficiários INDEFERIDOS:<b> {{ total_indeferidos }}</b></li>
+            <li>Total de Beneficiários SUSPENSOS:<b> {{ total_suspensos }}</b></li>
+            <li>Total de Beneficiários AUSENTES:<b> {% if total_ausentes %} {{ total_ausentes }} {% else %} 0 {% endif %}</b></li>
 
         <p><b>TOTAL DE CESTAS BÁSICAS ENTREGUES EM 2021: * {{ total_2021 }} Cestas</b></p>
             <li>Total de cestas entregues no mês passado:<b> {{ total_mes_anterior }}</b></li>
             <li>Total de cestas entregues este mês até o momento:<b> {{ total_esse_mes }}</b></li>
             <li>Total de cestas agendadas para entrega próximo mês:<b> {{ total_prox_mes }}</b></li>
         </ul>
-    <div class="row justify-content-center">
-        <div class="col-sm-11 sm-1" >
-        {{div | safe}}
-        </div></div>
 
     </div>
-</div>
-<div class="div2"> {{div | safe}}</div>
 
-{% if proxs_beneficiarios %}
-    <div class="row justify-content-center">
-        <div class="col-sm-11 sm-1" >
-    <p> Listas dos {{ total_prox_mes }} Beneficiários sinalizados para receber próximo mês</p>
-        <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>PROX_ENTREGA</th>
-            <th>NOME</th>
-            <th>CPF</th>
-            <th>NIS</th>
-            <th>BAIRRO</th>
-            <th>ORIGEM</th>
-            <th>À_RECEBER</th>
-        </tr>
-        <ul>
-            {% for beneficiario in proxs_beneficiarios %}
-            <tr align="center">
-                    <td>{{ beneficiario.N }} </td>
-                    <td> {{ beneficiario.PROX_ENTREGA }}</td>
-                    <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
-                    <td> {{ beneficiario.CPF }}</td>
-                    <td> {{ beneficiario.NIS }}</td>
-                    <td> {{ beneficiario.BAIRRO }} </td>
-                    <td> {{ beneficiario.ORIGEM }} </td>
-                    <td>{{ beneficiario.PROX_CESTA }} </td>
-            </tr>
-            {% endfor %}
-        </ul>
-        </table>
-        </div></div>
-        {% endif %}
-<br>
+
+    <div class="row justify-content-center" style="padding:15px;">
+        <div class="col-sm-6">
+            <div class="card" align="center">
+              <h5 class="card-header">Distribuição mensal de Cestas Básicas</h5>
+              <div class="card-body">
+                  {{div | safe}}
+              </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+              <h5 class="card-header">Distribuição de cestas básicas por Unidade SUAS em 2021</h5>
+              <div class="card-body">
+                {{div2 | safe}}
+              </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center" >
+        <div class="card" style="width:95%;">
+          <h5 class="card-header">Distribuição mensal de Cestas Básicas</h5>
+          <div class="card-body">
+              {{div3 | safe}}
+          </div>
+        </div>
+    </div>
+
+    {% if beneficiarios_desatualizados  %}
+        <h4> &nbsp;Listas dos {{ total_desatualizados }} cadastros desatualizados</h4>
+
+        <div class="table-responsive" style="padding:15px;">
+
+            <table class="table" style="background-color:#FFF;">
+                <thead class="thead-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>STATUS</th>
+                        <th>PROX_ENTREGA</th>
+                        <th>NOME</th>
+                        <th>CPF</th>
+                        <th>NIS</th>
+                        <th>BAIRRO</th>
+                        <th>ORIGEM</th>
+                        <th>À_RECEBER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for beneficiario in beneficiarios_desatualizados %}
+                    <tr align="center">
+                            <td scope="row">{{ beneficiario.N }} </td>
+                            {% if beneficiario.STATUS == 'DEFERIDO' %}
+                                    <td style="color:green;font-weight: bold;">
+                                {% elif beneficiario.STATUS == 'FINALIZADO' %}
+                                    <td style="color:orange;font-weight: bold;">
+                                {% elif beneficiario.STATUS == 'EMERGENCIAL' %}
+                                    <td style="color:teal;font-weight: bold;">
+                                {% elif beneficiario.STATUS == 'SUSPENSO' %}
+                                    <td style="color:olive;font-weight: bold;">
+                                {% else %}
+                                    <td style="color:red;font-weight: bold;">
+                            {% endif %}
+                                    {{ beneficiario.STATUS }}</td>
+                            <td> {{ beneficiario.PROX_ENTREGA }}</td>
+                            <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
+                            <td> {{ beneficiario.CPF }}</td>
+                            <td> {{ beneficiario.NIS }}</td>
+                            <td> {{ beneficiario.BAIRRO }} </td>
+                            <td> {{ beneficiario.ORIGEM }} </td>
+                            <td>{{ beneficiario.PROX_CESTA }} </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% endif %}
+</div>
 {% endblock %}

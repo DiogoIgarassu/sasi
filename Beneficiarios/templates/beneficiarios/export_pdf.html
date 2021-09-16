@@ -14,35 +14,37 @@
         {% endif %}
 
      {% if beneficiarios %}
-
-        <table border="1">
-        <tr>
-            <th>N</th>
-            <th>STATUS</th>
-            <th>DATA</th>
-            <th>NOME</th>
-            <th>CPF</th>
-            <th>NIS</th>
-            <th>BAIRRO</th>
-            <th>ORIGEM</th>
-            <th>QUANTAS?</th>
-        </tr>
-        <ul>
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th>N</th>
+                    <th>STATUS</th>
+                    <th>DATA</th>
+                    <th>NOME</th>
+                    <th>CPF</th>
+                    <th>NIS</th>
+                    <th>BAIRRO</th>
+                    <th>ORIGEM</th>
+                    <th>QUANTAS?</th>
+                </tr>
+            </thead>
+        <tbody>
             {% for beneficiario in beneficiarios %}
-            <tr align="center">
-                    <td>{{ beneficiario.CONT }} </td>
-                    <td>{% if beneficiario.STATUS == 'DEFERIDO' %}
-                            <p style="color:green;font-weight: bold;">
+            <tr align="center" >
+                    <th scope="row">{{ beneficiario.CONT }} </th>
+                    {% if beneficiario.STATUS == 'DEFERIDO' %}
+                            <td style="color:green;font-weight: bold;">
                         {% elif beneficiario.STATUS == 'FINALIZADO' %}
-                            <p style="color:orange;font-weight: bold;">
+                            <td style="color:orange;font-weight: bold;">
                         {% elif beneficiario.STATUS == 'EMERGENCIAL' %}
-                            <p style="color:teal;font-weight: bold;">
+                            <td style="color:teal;font-weight: bold;">
                         {% elif beneficiario.STATUS == 'SUSPENSO' %}
-                            <p style="color:olive;font-weight: bold;">
+                            <td style="color:olive;font-weight: bold;">
                         {% else %}
-                            <p style="color:red;font-weight: bold;">
+                            <td style="color:red;font-weight: bold;">
                     {% endif %}
-                            {{ beneficiario.STATUS }}</p> </td>
+                            {{ beneficiario.STATUS }}</td>
                     <td> {{ beneficiario.DATA }}</td>
                     <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
                     <td> {{ beneficiario.CPF }}</td>
@@ -52,8 +54,9 @@
                     <td>{{ beneficiario.QUANTAS }} </td>
             </tr>
             {% endfor %}
-        </ul>
-        </table>
+        </tbody>
+      </table>
+    </div>
         {% endif %}
 
     </div>

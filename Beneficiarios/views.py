@@ -1,4 +1,6 @@
 import codecs
+import random
+
 from .models import *
 from django.shortcuts import render, redirect
 import gspread
@@ -24,6 +26,8 @@ from Beneficiarios.utils import link_callback
 import django.template.loader
 from io import BytesIO
 import time
+from bokeh.palettes import Category10, Category20, Category20c, Turbo256
+from bokeh.transform import factor_cmap
 #from django.contrib.sessions.models import Session
 #Session.objects.all().delete()
 
@@ -50,7 +54,7 @@ mes_port = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO',
 TODAY = datetime.date.today()
 MES_ATUAL = str(TODAY.strftime("%B"))
 MES_ATUAL_INDEX = mes_english.index(MES_ATUAL)
-PROX_MES = mes_port[MES_ATUAL_INDEX + 1]
+PROX_MES = mes_english[MES_ATUAL_INDEX + 1]
 first = TODAY.replace(day=1)
 lastMonth = first - datetime.timedelta(days=1)
 MES_PASSADO = str(lastMonth.strftime("%B"))
@@ -91,6 +95,7 @@ def busca_auxlio(request):
     busca = request.GET.get('busca', None)
     beneficiarios = []
     mensagem = None
+    cont = 0
 
     try:
         if tipo_busca:
@@ -101,13 +106,17 @@ def busca_auxlio(request):
                 for dic in dados:
                     if busca == dic['CPF']:
                         beneficiarios.append(dic)
+                        cont += 1
+                        mensagem = f'Foram encontrados {cont} cadastros com CPF {busca}'
             elif tipo_busca == 'Nome':
                 busca = busca.upper()
                 for dic in dados:
                     if busca in dic['NOME']:
                         beneficiarios.append(dic)
+                        cont += 1
+                        mensagem = f'Foram encontrados {cont} cadastros com nome {busca}'
             else:
-                mensagem = "Nenhum beneficiário encontrato."
+                mensagem = "Nenhum beneficiário encontrado."
     except:
         mensagem = "Dados inválidos."
 
@@ -118,7 +127,7 @@ def busca_auxlio(request):
 
 @login_required
 def busca_cestas(request, cpf=None):
-    cont_cestas = 0
+    cont_cestas, cont = 0, 0
     if cpf:
         tipo_busca = "CPF"
         busca = cpf
@@ -141,6 +150,8 @@ def busca_cestas(request, cpf=None):
                     if busca == dic['CPF']:
                         beneficiarios.append(dic)
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
+                        cont += 1
+                        mensagem = f'Foram encontrados {cont} cadastros com CPF {busca}'
             elif tipo_busca == 'NIS':
                 for dic in dados:
                     if str(busca) == str(dic['NIS']):
@@ -152,12 +163,15 @@ def busca_cestas(request, cpf=None):
                     if busca in dic['NOME']:
                         beneficiarios.append(dic)
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
+                        cont += 1
+                        mensagem = f'Foram encontrados {cont} cadastros com nome {busca}.'
         if len(beneficiarios) == 0:
             mensagem = "Nenhum beneficiário encontrato."
     except:
         mensagem = "Ocorreu um erro interno, por favor entre em contato com o administrador"
 
-    return render(request, 'beneficiarios/busca_cestas.html', {'beneficiarios': beneficiarios, 'mensagem': mensagem, 'unique':unique})
+    return render(request, 'beneficiarios/busca_cestas.html', {'beneficiarios': beneficiarios, 'mensagem': mensagem, 'unique':unique,
+                                                               'BUSCA': tipo_busca})
 
 
 @login_required
@@ -312,11 +326,20 @@ def lista_cestas(request):
     template_name = 'beneficiarios/lista_cesta.html'
 
     if ano and mes:
-        ano = int(ano)
-        mes = int(mes)
-        a, b = calendar.monthrange(ano, mes)
-        data_i = f'1/{mes}/{ano}'
-        data_f = f'{b}/{mes}/{ano}'
+
+        if mes != 'TODOS':
+            ano = int(ano)
+            mes = int(mes)
+            a, b = calendar.monthrange(ano, mes)
+            data_i = f'1/{mes}/{ano}'
+            data_f = f'{b}/{mes}/{ano}'
+            context['MES'] = mes_port[mes - 1]
+        else:
+            ano = int(ano)
+            a, b = calendar.monthrange(ano, MES_ATUAL_INDEX + 1)
+            data_i = f'1/1/{ano}'
+            data_f = f'{b}/{MES_ATUAL_INDEX + 1}/{ano}'
+            context['MES'] = mes
 
         if data_i:
             sheet = client.open('cesta_basica_emergencial').sheet1
@@ -350,6 +373,9 @@ def lista_cestas(request):
     if mensagem:
         context['mensagem'] = mensagem
         mensagem_pdf = mensagem
+    context['ANO'] = ano
+    context['MES_VALOR'] = mes
+    context['STATUS'] = status
 
     return render(request, template_name, context)
 
@@ -398,103 +424,168 @@ def export_pdf(request):
 def conte_cestas():
     dic_status = defaultdict(list)
     dic_datas = defaultdict(list)
-    total = 0
-    PROX_CESTA = 0
-    proxs_beneficiarios = []
+    dic_origens = defaultdict(list)
+    dic_bairros = defaultdict(list)
+    total_registros, total_ano, PROX_CESTA, CESTA_ATUAL_RECEBEU, CESTA_ATUAL_N_RECEBEU, pk = 0, 0, 0, 0, 0, 0
+    atuais_ben_receberam, atuais_ben_n_receberam, proxs_beneficiarios,beneficiarios_desatualizados = [], [], [], []
+    mes_atual_pt = traduzir(MES_ATUAL)
+    prox_mes_pt = traduzir(PROX_MES)
+
     sheet = client.open('cesta_basica_emergencial').sheet1
     dados = sheet.get_all_records()
+
     for linha in dados: #PARA CADA LINHA DO ARQUIVO
-        total += 1
+        total_registros += 1 #TOTAL DE REGISTROS NO SISTEMA
+
         STATUS = linha['STATUS']
         if dic_status[STATUS]: #CRIAR DICIONARIO DE STATUS
             cont1 = int(dic_status[STATUS]) + 1
             dic_status[STATUS] = cont1
         else:
             dic_status[STATUS] = 1
+
         for col in linha: #PARA CADA COLUNA DA LINHA
-            if col in meses: #SE A COLUNA ESTA NA TABELA MESES
+
+            if col in meses: #SE A COLUNA ESTA NA TABELA MESES A RECEBER [1_MES 2_MES 3_MES ...]
                 DATA = linha[col]
                 if '/' in DATA: #SE CAMPO ESTÁ PREENCHIDO
-                    DATAT = datetime.datetime.strptime(DATA, '%d/%m/%Y')
-                    MES_DATA = datetime.datetime.strftime(DATAT, "%B")
-                    ANO_DATA = datetime.datetime.strftime(DATAT, "%Y")
+                    DATA_FORMATADA = datetime.datetime.strptime(DATA, '%d/%m/%Y') #DATA NO PADRÃO d/m/Y
+                    MES_DATA = datetime.datetime.strftime(DATA_FORMATADA, "%B") #MES DESTA DATA
+                    ANO_DATA = datetime.datetime.strftime(DATA_FORMATADA, "%Y") #ANO DESTA DADA
                     ANO = datetime.datetime.strptime('2021', "%Y")
-                    ANO = datetime.datetime.strftime(ANO, "%Y")
+                    ANO = datetime.datetime.strftime(ANO, "%Y") #ANO DE 2021 FORMATADO
                     MES_DATA = str(MES_DATA)
                     if ANO_DATA == ANO: #SE O ANO FOR 2021
+
+                        if linha['N'] != pk:
+                            total_ano += 1
+                            pk = linha['N']
+
                         MES_DATA = traduzir(MES_DATA)
                         if dic_datas[MES_DATA]: #CRIAR DICIONARIOS DE MESES
                             dic_datas[MES_DATA].append(DATA)
                         else:
                             dic_datas[MES_DATA] = [DATA]
 
+                        ORIGEM = linha['ORIGEM']
+                        if dic_origens[ORIGEM]:
+                            dic_origens[ORIGEM].append(1)
+                        else:
+                            dic_origens[ORIGEM] = [1]
+
+                        BAIRRO = linha['BAIRRO']
+                        if dic_bairros[BAIRRO]:
+                            dic_bairros[BAIRRO].append(1)
+                        else:
+                            dic_bairros[BAIRRO] = [1]
+
         cont, ultima_data = Conta_cestas(linha)
         p_cesta = linha['PROX_CESTA']
+        p_cesta = p_cesta.strip('.')
         data_solicitacao = linha['DATA_SOLICITACAO']
-        if ultima_data and PROX_MES:
-            p_cesta_date = datetime.datetime.strptime(ultima_data, '%d/%m/%Y')
-            p_cesta_date = str(p_cesta_date.strftime("%B"))
-            today = datetime.date.today()
-            mes_atual = str(today.strftime("%B"))
-            if "/" in p_cesta:
-                p_cesta = p_cesta.split("/")
-                if mes_atual == p_cesta_date:
-                    if int(p_cesta[1]) == int(p_cesta[0]):
-                        PROX_CESTA += 1
-                        proxs_beneficiarios.append(linha)
-                if MES_ATUAL != p_cesta_date:
-                        if int(p_cesta[1]) > int(p_cesta[0]):
+        if linha['STATUS'] == 'DEFERIDO':
+            #print('Cesta atual: ', CESTA_ATUAL, 'Prox Cesta: ', PROX_CESTA)
+            if ultima_data:
+                ult_cesta_date = datetime.datetime.strptime(ultima_data, '%d/%m/%Y')
+                ult_cesta_date = str(ult_cesta_date.strftime("%B"))
+
+                if "/" in p_cesta:
+                    p_cesta = p_cesta.split("/")
+
+                    if MES_ATUAL != ult_cesta_date and mes_atual_pt in linha['PROX_ENTREGA']: #AINDA NÃO RECEBEU ESTE MÊS
+                        if int(p_cesta[1]) == int(p_cesta[0]): #RECEBERÁ A ÚLTIMA
+                            CESTA_ATUAL_N_RECEBEU += 1
+                            atuais_ben_n_receberam.append(linha)
+                        elif int(p_cesta[1]) > int(p_cesta[0]): #VAI RECEBER ESTE MÊS E TEM PROXIMO MÊS
+                            PROX_CESTA += 1
+                            CESTA_ATUAL_N_RECEBEU += 1
+                            proxs_beneficiarios.append(linha)
+                            atuais_ben_n_receberam.append(linha)
+
+                    elif MES_ATUAL == ult_cesta_date and prox_mes_pt in linha['PROX_ENTREGA']: #JA RECEBEU ESTE MêS E TEM PROXIMO MÊS
+                        if int(p_cesta[1]) == int(p_cesta[0]): #A PROXIMA CESTA É A ULTIMA
+                            CESTA_ATUAL_RECEBEU += 1
+                            atuais_ben_receberam.append(linha)
                             PROX_CESTA += 1
                             proxs_beneficiarios.append(linha)
-        else:
-            if "/" in p_cesta and "/" in data_solicitacao:
-                PROX_CESTA += 1
-                proxs_beneficiarios.append(linha)
 
+                    elif MES_ATUAL != ult_cesta_date and prox_mes_pt in linha['PROX_ENTREGA']: #FEZ SOLICITAÇÃO AGORA E TEM PROXIMO MÊS
+                            if int(p_cesta[1]) > int(p_cesta[0]):       #PROXIMO MÊS RECEBE A PRIMEIRA CESTA
+                                PROX_CESTA += 1
+                                proxs_beneficiarios.append(linha)
+                    else:
+                        beneficiarios_desatualizados.append(linha)
+            else:
+                if "/" in p_cesta and "/" in data_solicitacao:
+                    if mes_atual_pt in linha['PROX_ENTREGA']: #VAI RECEBER A PRIMEIRA ESTE MÊS
+                        #print('setembro =', linha['PROX_ENTREGA'], linha['N'])
+                        PROX_CESTA += 1
+                        CESTA_ATUAL_N_RECEBEU += 1
+                        proxs_beneficiarios.append(linha)
+                        atuais_ben_n_receberam.append(linha)
+                    else:
+                        beneficiarios_desatualizados.append(linha)
+                        #print('setembro =', linha['PROX_ENTREGA'], linha['N'])
 
-    return total, dic_status, dic_datas, proxs_beneficiarios
+    return total_registros, total_ano, dic_status, dic_datas, proxs_beneficiarios, beneficiarios_desatualizados,\
+           atuais_ben_receberam, dic_bairros, dic_origens
 
 @login_required
 def relatorios(request):
-    total, dic_status, dic_datas, proxs_beneficiarios = conte_cestas()
+    total_registros, total_ano, dic_status, dic_datas, proxs_beneficiarios, beneficiarios_desatualizados,\
+    atuais_beneficiarios, dic_bairros, dic_origens = conte_cestas()
     template_name = 'beneficiarios/relatorios.html'
     context = {}
-    today = datetime.date.today()
-    first = today.replace(day=1)
-    lastMonth = first - datetime.timedelta(days=1)
-    mes_passado = str(lastMonth.strftime("%B"))
-    mes_passado = traduzir(mes_passado)
-    mes_atual = str(first.strftime("%B"))
-    mes_atual = traduzir(mes_atual)
 
-    context['total'] = total
+    MES_PASSADO_PT = traduzir(MES_PASSADO)
+    MES_ATUAL_PT = traduzir(MES_ATUAL)
+    PROX_MES_PT = traduzir(PROX_MES)
+
+    context['total_registros'] = total_registros
+    context['total_ano'] = total_ano
     context['total_ativos'] = dic_status['DEFERIDO']
     context['total_finalizados'] = dic_status['FINALIZADO']
     context['total_suspensos'] = dic_status['SUSPENSO']
     context['total_indeferidos'] = dic_status['INDEFERIDO']
     context['total_emergenciais'] = dic_status['EMERGENCIAL']
+    context['total_ausentes'] = dic_status['AUSENTE']
+
     context['proxs_beneficiarios'] = proxs_beneficiarios
+    context['beneficiarios_desatualizados'] = beneficiarios_desatualizados
+    context['atuais_beneficiarios'] = atuais_beneficiarios
 
     meses, qtd_mes = [], []
-
     for mes in mes_port:
         if mes in dic_datas:
             meses.append(mes)
             qtd_mes.append(len(dic_datas[mes]))
 
+    bairros, qtd_bairros = [], []
+    for bairro in dic_bairros:
+        bairros.append(bairro)
+        qtd_bairros.append(len(dic_bairros[bairro]))
+
+    origens, qtd_origens = [], []
+    for origem in dic_origens:
+        origens.append(origem)
+        qtd_origens.append(len(dic_origens[origem]))
+
+
     context['total_2021'] = sum(qtd_mes)
-    context['total_mes_anterior'] = len(dic_datas[mes_passado])
-    context['total_esse_mes'] = len(dic_datas[mes_atual])
+    context['total_mes_anterior'] = len(dic_datas[MES_PASSADO_PT])
+    context['total_esse_mes'] = len(dic_datas[MES_ATUAL_PT])
+
+    context['total_falta_esse_mes'] = len(atuais_beneficiarios)
     context['total_prox_mes'] = len(proxs_beneficiarios)
-
-    # DEFININDO NOME DO EIXO X E Y
-    x_axis = 'Distruibuição de Cestas Básicas por mês em 2021.'
-    y_axis = 'plotado por https://sasi-igarassu.herokuapp.com/'
-
-    TOOLTIPS = [("Cidade", "@x"), ("Total", "@y")]
+    context['total_desatualizados'] = len(beneficiarios_desatualizados)
 
 
     # DEFININDO AS CONFIGURAÇÕES DO GRÁFICO 1
+    x_axis = 'Distruibuição de Cestas Básicas por mês em 2021.'
+    y_axis = 'plotado por https://sasi-igarassu.herokuapp.com/'
+
+    TOOLTIPS = [("Mês", "@x"), ("Total", "@y")]
+
     plt = figure(x_range=meses, plot_width=800, plot_height=400, title="tipo",
                  toolbar_location="right", x_axis_label=x_axis,
                  y_axis_label=y_axis, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
@@ -508,17 +599,63 @@ def relatorios(request):
     #plt.vbar('x', top='y', color="#ff5252", bottom=0, width=0.6, source=source)
     plt.line(x=meses, y=qtd_mes, color='red', line_width=3)
 
-    #print(meses)
-    #print(lista_total)
+    # DEFININDO AS CONFIGURAÇÕES DO GRÁFICO 2
+    x_axis2 = 'Distruibuição de Cestas Básicas por Unidade SUAS em 2021.'
+    y_axis2 = 'plotado por https://sasi-igarassu.herokuapp.com/'
+
+    TOOLTIPS2 = [("Unidade SUAS", "@x"), ("Total", "@y")]
+
+    plt2 = figure(x_range=origens, plot_width=800, plot_height=400, title="tipo",
+                 toolbar_location="right", x_axis_label=x_axis2,
+                 y_axis_label=y_axis2, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
+                 tooltips=TOOLTIPS2)
+
+    plt2.xaxis.major_label_orientation = pi / 4
+    plt2.sizing_mode = 'scale_width'
+    total_origens = len(origens)
+
+    source2 = ColumnDataSource(data=dict(x=origens, y=qtd_origens, color=Category20[total_origens]))
+    plt2.vbar('x', top='y', color='color', bottom=0, width=0.6, source=source2)
+    plt2.line(x=origens, y=qtd_origens, color='red', line_width=3)
+
+    # DEFININDO AS CONFIGURAÇÕES DO GRÁFICO 3
+    x_axis3 = 'Distruibuição de Cestas Básicas por Bairros em 2021.'
+    y_axis3 = 'plotado por https://sasi-igarassu.herokuapp.com/'
+
+    TOOLTIPS3 = [("Bairro", "@x"), ("Total", "@y")]
+
+    plt3 = figure(x_range=bairros, plot_width=800, plot_height=400, title="tipo",
+                  toolbar_location="right", x_axis_label=x_axis3,
+                  y_axis_label=y_axis3, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
+                  tooltips=TOOLTIPS3)
+
+    plt3.xaxis.major_label_orientation = pi / 4
+    plt3.sizing_mode = 'scale_width'
+    turbo_color = list(Turbo256)
+    random.shuffle(turbo_color)
+    total_bairros = len(bairros)
+
+    source3 = ColumnDataSource(data=dict(x=bairros, y=qtd_bairros, color=turbo_color[:total_bairros]))
+    plt3.vbar('x', top='y', color="color", bottom=0, width=0.6, source=source3)
+    #plt3.line(x=bairros, y=qtd_bairros, color='red', line_width=1)
+
     script, div = components(plt)
     context['script'] = script
     context['div'] = div
+
+    script2, div2 = components(plt2)
+    context['script2'] = script2
+    context['div2'] = div2
+
+    script3, div3 = components(plt3)
+    context['script3'] = script3
+    context['div3'] = div3
     #show(plt)
 
     mensagem = "Em 2021 foram entregues {0} cestas básicas " \
                ". Em {1} foram {2} Cestas, " \
-               "no mês atual foram até o momento {3} cestas.".format(context['total_2021'], mes_passado,
-                                                             context['total_mes_anterior'], context['total_prox_mes'])
+               "no mês atual foram até o momento {3} cestas.".format(context['total_2021'], MES_PASSADO_PT,
+                                                             context['total_mes_anterior'], context['total_esse_mes'])
 
     context['mensagem'] = mensagem
 

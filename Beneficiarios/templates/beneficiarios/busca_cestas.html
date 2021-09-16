@@ -26,6 +26,7 @@
             <form class="pure-form pure-form-stacked">
                 {% csrf_token %}
              <select name="tipo_busca" style="width:100px;" id="select">
+                <option value="{{ BUSCA }}" hidden>{{ BUSCA }}</option>
                 <option value="Nome">NOME</option>
                 <option value="CPF">CPF</option>
                 <option value="NIS">NIS</option>
@@ -44,48 +45,52 @@
         <br><p>{{ mensagem }}</p>
         {% endif %}
 
-        {% if beneficiarios %}
-        <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>STATUS</th>
-            <th>DATA</th>
-            <th>CPF</th>
-            <th>NIS</th>
-            <th>NOME</th>
-            <th>ENDEREÇO</th>
-            <th>ORIGEM</th>
-            <th>RECEBIDAS</th>
-        </tr>
-        <ul>
+ {% if beneficiarios %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>STATUS</th>
+                    <th>DATA</th>
+                    <th>CPF</th>
+                    <th>NIS</th>
+                    <th>NOME</th>
+                    <th>ENDEREÇO</th>
+                    <th>ORIGEM</th>
+                    <th>RECEBIDAS</th>
+                </tr>
+            </thead>
+        <tbody>
             {% for beneficiario in beneficiarios %}
-            <tr align="center">
-                    <td>{{ beneficiario.N }} </td>
-                    <td>{% if beneficiario.STATUS == 'DEFERIDO' %}
-                            <p style="color:green;font-weight: bold;">
+                <tr align="center" style="font-size: 15px;">
+                    <td scope="row">{{ beneficiario.N }} </td>
+                       {% if beneficiario.STATUS == 'DEFERIDO' %}
+                            <td style="color:green;font-weight: bold;">
                         {% elif beneficiario.STATUS == 'FINALIZADO' %}
-                            <p style="color:orange;font-weight: bold;">
+                            <td style="color:orange;font-weight: bold;">
                         {% elif beneficiario.STATUS == 'EMERGENCIAL' %}
-                            <p style="color:teal;font-weight: bold;">
+                            <td style="color:teal;font-weight: bold;">
                         {% elif beneficiario.STATUS == 'SUSPENSO' %}
-                            <p style="color:olive;font-weight: bold;">
+                            <td style="color:olive;font-weight: bold;">
                         {% else %}
-                            <p style="color:red;font-weight: bold;">
-
-                    {% endif %}{{ beneficiario.STATUS }}</p> </td>
+                            <td style="color:red;font-weight: bold;">
+                    {% endif %}
+                            {{ beneficiario.STATUS }}</td>
                     <td> {{ beneficiario.ULT_CESTA }}</td>
-                    <td> {{ beneficiario.CPF }}</td>
+                    <td style="font-size: 13px;"> {{ beneficiario.CPF }}</td>
                     <td> {{ beneficiario.NIS }}</td>
-                <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
+                    <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
                     <td> {{ beneficiario.ENDERECO }} </td>
                     <td> {{ beneficiario.ORIGEM }} </td>
-                    <td>{{ beneficiario.QTAS_CESTAS}} </td>
+                    <td>{{ beneficiario.QTAS_CESTAS }} </td>
             </tr>
             {% endfor %}
-        </ul>
-        </table>
-        {% endif %}
+         </tbody>
+      </table>
+  {% endif %}
     </div>
+ </div>
 </div>
 <script>
 $("#select").change(function() {

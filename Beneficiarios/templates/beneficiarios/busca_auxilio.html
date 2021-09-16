@@ -29,7 +29,9 @@
 
 
         {% if beneficiarios %}
-        <table border="1">
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="thead-light">
         <tr>
             <th>ID</th>
             <th>CPF</th>
@@ -39,11 +41,12 @@
             <th>MÃE</th>
             <th>OBSERVAÇÃO</th>
         </tr>
-        <ul>
+            </thead>
+        <tbody>
             {% for beneficiario in beneficiarios %}
-            <tr>
-                    <td>{{ beneficiario.N }} </td>
-                    <td> {{ beneficiario.CPF }}</td>
+            <tr style="font-size: 15px;">
+                    <td scope="row">{{ beneficiario.N }} </td>
+                    <td align="right"> {{ beneficiario.CPF }}</td>
                     <td> {{ beneficiario.NIS }}</td>
                     <td> {{ beneficiario.NOME }} </td>
                     <td> {{ beneficiario.NASCIMENTO }} </td>
@@ -51,10 +54,10 @@
                     <td>{{ beneficiario.OBSERVACAO }} </td>
             </tr>
             {% endfor %}
-        </ul>
+        </tbody>
         </table>
         {% endif %}
     </div>
 </div>
-
+</div>
 {% endblock %}
