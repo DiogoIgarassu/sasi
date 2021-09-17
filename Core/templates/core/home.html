@@ -11,7 +11,7 @@
  }
 </style>
 
-<br><br><br><br>
+<br>
     <div class="row justify-content-center">
         <div class="col-sm-2 sm-2" >
             <div class="col-md-12">
@@ -77,19 +77,23 @@
 <div class="row justify-content-center">
         <div class="col-sm-2 sm-2" >
             <div class="col-md-12">
+                <a href="{% url 'beneficiarios:promove_cursos' %}">
+                    <img src="{% static 'img/promove.png' %}" class="img">
+                <br><button class="pure-button pure-button-primary  img">Igarassu Promove</button></a>
+            </div>
+        </div>
+        <div class="col-sm-2 sm-2" >
+            <div class="col-md-12">
                 <a href="{% url 'beneficiarios:registrar_cesta' %}">
                     <img src="{% static 'img/b_users.png' %}" class="img">
                 <br><button class="pure-button pure-button-primary  img">Cadastrar Usuário</button></a>
             </div>
         </div>
-            <div class="col-sm-2 sm-2" >
+        <div class="col-sm-2 sm-2" >
             <div class="col-md-12">
             </div>
         </div>
-            <div class="col-sm-2 sm-2" >
-            <div class="col-md-12">
-            </div>
-        </div><div class="col-sm-2 sm-2" >
+        <div class="col-sm-2 sm-2" >
             <div class="col-md-12">
             </div>
         </div>

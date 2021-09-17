@@ -26,7 +26,7 @@
             <form class="pure-form pure-form-stacked">
                 {% csrf_token %}
              <select name="tipo_busca" style="width:100px;" id="select">
-                <option value="{{ BUSCA }}" hidden>{{ BUSCA }}</option>
+                <option value="{{ tipo_busca }}" hidden>{{ tipo_busca }}</option>
                 <option value="Nome">NOME</option>
                 <option value="CPF">CPF</option>
                 <option value="NIS">NIS</option>

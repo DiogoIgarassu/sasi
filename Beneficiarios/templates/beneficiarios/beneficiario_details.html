@@ -12,7 +12,8 @@
 {% for dados in beneficiario %}
 
 
-<h2>{{ dados.NOME }}</h2></center>
+<h2>{{ dados.NOME }}
+ <a href="{% url 'beneficiarios:promove_details' dados.N %}" class="btn btn-danger">Igarassu Promove</a></h2></center>
 <div class="container">
 <form class="needs-validation" method="post" novalidate>
 {% csrf_token %}
@@ -20,7 +21,7 @@
   <div class="form-row">
 
     <div class="col-2">
-      <label for="validationCustom01">Ordem</label>
+      <label for="validationCustom01">ID</label>
       <input type="text" class="form-control" name="N" id="validationCustom01" value="{{ dados.N }}" readonly>
       <div class="valid-feedback">
         Muito Bom!
@@ -126,7 +127,7 @@
        <label for="validationCustom14">Cesta à Receber</label>
        <input type="text" class="form-control" name="PROX_CESTA" id="validationCustom14" value="{{ dados.PROX_CESTA }}" >
           <div class="invalid-feedback">
-        Please provide a valid zip.
+        Informe quando será a próxima cesta.
       </div>
     </div>
     <div class="col-md-3">
@@ -145,7 +146,7 @@
       <label for="validationCustom12">Técnico Social</label>
       <input type="text" oninput="handleInput(event)" class="form-control" name="TECNICO_RESPONSAVEL" id="validationCustom12" value="{{ dados.TECNICO_RESPONSAVEL }}" >
       <div class="invalid-feedback">
-        Please provide a valid zip.
+        Informe o Tecnico Social.
       </div>
     </div>
   </div>
@@ -314,7 +315,8 @@
         <div class="form-row">
             <div class="col-sm-10">
           <label for="validationCustom31">Observações</label>
-           <textarea type="text" oninput="handleInput(event)" class="form-control" name="OBSERVACOES" id="validationCustom31" rows="3" value="{{ dados.OBSERVACOES }}" ></textarea>
+           <textarea oninput="handleInput(event)" class="form-control" name="OBSERVACOES" id="validationCustom31"
+                     rows="3" >{{ dados.OBSERVACOES }}</textarea>
           <div class="invalid-feedback">
             Please provide a valid zip.
           </div>

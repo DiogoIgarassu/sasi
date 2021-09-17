@@ -1,0 +1,321 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block content %}
+
+
+
+<center>
+
+{% for dados in beneficiario %}
+
+<h1>PROJETO IGARASSU PROMOVE</h1>
+<h4>{{ dados.NOME }}</h4></center>
+
+<div class="container" style="background-color:#ffe6ff;">
+<form class="needs-validation" method="post" novalidate>
+{% csrf_token %}
+
+
+  <div class="form-row">
+    <div class="col-2">
+      <label for="validationCustom01">ID</label>
+      <input type="text" class="form-control" name="ID_BE" id="validationCustom01" value="{{ dados.N }}" readonly>
+      <div class="valid-feedback">
+        Muito Bom!
+      </div>
+    </div>
+     <div class="col-5">
+          <label for="validationCustom02">Status</label>
+          <select class="form-control" name="STATUS" id="validationCustom03" readonly>
+            <option value="{{ dados.STATUS }}" hidden >{{ dados.STATUS }}</option>
+              {% for stat in status %}
+              <option value="{{ stat }}" >{{ stat }}</option>
+              {% endfor %}
+          </select>
+      </div>
+    <div class="col-5">
+      <label for="validationCustom02">Ultima Atualização</label>
+      <input type="text" class="form-control" name="ULTIMA_ATUALIZACAO" id="validationCustom02" value="{{ dados.ULTIMA_ATUALIZACAO }}"  readonly>
+    </div>
+      <div class="invalid-feedback">
+        Por favor informe a situação cadastral do usuário.
+      </div>
+    </div>
+
+  <div class="form-row">
+    <div class="col-sm-4">
+      <label for="validationCustom04">CPF</label>
+      <input type="text" class="form-control" onkeypress="$(this).mask('999.999.999-99');" name="CPF" id="validationCustom04" value="{{ dados.CPF }}" readonly>
+      <div class="invalid-feedback">
+        Por favor informe o CPF.
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <label for="validationCustom05">NIS</label>
+      <input type="text" class="form-control" onkeypress="$(this).mask('00000000000')" name="NIS" id="validationCustom05" value="{{ dados.NIS }}" readonly>
+    </div>
+        <div class="col-sm-4">
+      <label for="validationCustom06">RG</label>
+      <input type="text" class="form-control" name="RG" id="validationCustom06" value="{{ dados.RG }}" readonly>
+      <div class="invalid-feedback">
+        Por favor informe a situação cadastral do usuário.
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-sm-8 sm-12">
+      <label for="validationCustom07">Nome</label>
+      <input type="text" oninput="handleInput(event)" class="form-control" name="NOME" id="validationCustom07" value="{{ dados.NOME }}" readonly>
+      <div class="invalid-feedback">
+        Por favor informe o nome completo.
+      </div>
+    </div>
+    <div class="col-sm-4 sm-12">
+      <label for="validationCustom32">Nascimento</label>
+      <input type="text" class="form-control" onkeypress="$(this).mask('00/00/0000')" name="NASCIMENTO" id="validationCustom32" value="{{ dados.NASCIMENTO }}" readonly>
+      <div class="invalid-feedback">
+        Por favor informe a data de nascimento.
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-sm-5 sm-12">
+      <label for="validationCustom08">Endereço</label>
+      <input type="text" oninput="handleInput(event)" class="form-control" name="ENDERECO" id="validationCustom08" value="{{ dados.ENDERECO }}" readonly>
+      <div class="invalid-feedback">
+        Por favor informe o endereço.
+      </div>
+    </div>
+    <div class="col-sm-3 sm-6">
+      <label for="validationCustom33">Localidade</label>
+      <input type="text" oninput="handleInput(event)" class="form-control" name="LOCALIDADE" id="validationCustom33" value="{{ dados.LOCALIDADE }}" readonly>
+      <div class="invalid-feedback">
+        Por favor informe a localidade.
+      </div>
+    </div>
+    <div class="col-sm-4 sm-6">
+      <label for="validationCustom09">Bairro</label>
+      <input type="text"  oninput="handleInput(event)" class="form-control" name="BAIRRO" id="validationCustom09" value="{{ dados.BAIRRO }}" readonly>
+      <div class="invalid-feedback">
+        Por favor informe o bairro.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="form-row">
+      <div class="col-sm-3 sm-6">
+      <label for="validationCustom10">Contato 1</label>
+      <input type="text" class="form-control"onkeypress="$(this).mask('(00) 0000-00009')" name="TELEFONE" id="validationCustom10" value="{{ dados.TELEFONE }}" readonly>
+      <div class="invalid-feedback">
+        Por favor coloque um número válido.
+      </div>
+    </div>
+      <div class="col-sm-3 sm-6">
+      <label for="validationCustom41">Contato 2</label>
+      <input type="text" class="form-control"onkeypress="$(this).mask('(00) 0000-00009')" name="TELEFONE2" id="validationCustom41" value="{{ dados.TELEFONE2 }}" >
+      <div class="invalid-feedback">
+        Por favor coloque um número válido.
+      </div>
+    </div>
+    <div class="col-sm-6 sm-12">
+      <label for="validationCustom40">Escolaridade</label>
+      <select class="form-control" name="ESCOLARIDADE" id="validationCustom40" REQUIRED>
+        <option value="{{ dados.ESCOLARIDADE }}" hidden>{{ dados.ESCOLARIDADE }}</option>
+          {% for stat in escolaridades %}
+          <option value="{{ stat }}" >{{ stat }}</option>
+          {% endfor %}
+          </select>
+      <div class="invalid-feedback">
+        Por favor informe a escolaridade.
+      </div>
+    </div>
+  </div>
+
+ <div class="form-row">
+    <div class="col-sm-3 sm-6">
+        <label for="validationCustom13">Última Cesta</label>
+        <input type="text" oninput="handleInput(event)" class="form-control" name="ULT_CESTA" id="validationCustom13" value="{{ dados.ULT_CESTA }}" readonly>
+        <div class="invalid-feedback">
+        Informe a última cesta.
+      </div>
+    </div>
+      <div class="col-sm-3 sm-6">
+       <label for="validationCustom14">Cestas Recebidas</label>
+       <input type="text" class="form-control" name="QTAS_CESTAS" id="validationCustom14" value="{{ dados.QTAS_CESTAS }}" readonly>
+          <div class="invalid-feedback">
+        Informe quando será a proxima cesta.
+      </div>
+    </div>
+    <div class="col-md-3">
+      <label for="validationCustom11">Unidade SUAS</label>
+      <select class="form-control" name="ORIGEM" id="validationCustom11" readonly>
+        <option value="{{ dados.ORIGEM }}" hidden>{{ dados.ORIGEM }}</option>
+          {% for stat in unidades %}
+          <option value="{{ stat }}" >{{ stat }}</option>
+          {% endfor %}
+          </select>
+      <div class="invalid-feedback">
+        Por favor identifica a origem da demanda.
+      </div>
+    </div>
+    <div class="col-md-3">
+      <label for="validationCustom12">Técnico Social</label>
+      <input type="text" oninput="handleInput(event)" class="form-control" name="TECNICO_RESPONSAVEL" id="validationCustom12" value="{{ dados.TECNICO_RESPONSAVEL }}"  readonly>
+      <div class="invalid-feedback">
+        Please provide a valid zip.
+      </div>
+    </div>
+  </div>
+<hr>
+
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="card bg-light mb-3">
+        <div class="card-header text-white bg-primary" style="font-size:18px; font-weight: bold;">Cursos de Interessados ou Matriculados</div>
+          <div class="card-body">
+            {% for curso in cursos %}
+              <div class="form-check">
+                  {% if curso in cursos_registrados %}
+                        {% if curso in cursos_desistentes %}
+                            <input class="form-check-input" type="checkbox" value="{{ curso }}"  name="ENTRAR_CURSO-{{ curso }}"  checked disabled>
+                            <label class="form-check-label" style="color: red; text-decoration: line-through;">
+                        {% else %}
+                            <input class="form-check-input" type="checkbox" value="{{ curso }}"  name="ENTRAR_CURSO-{{ curso }}"  checked disabled>
+                            <label class="form-check-label" style="color: blue;">
+                        {% endif%}
+                  {% else %}
+                     <input class="form-check-input" type="checkbox" value="{{ curso }}"  name="ENTRAR_CURSO-{{ curso }}"  >
+                     <label class="form-check-label">
+                  {% endif%}
+                {{ curso }}
+                </label>
+              </div>
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="card bg-light mb-3">
+        <div class="card-header text-white bg-danger"  style="font-size:18px; font-weight: bold;"> Desistência dos Cursos</div>
+          <div class="card-body">
+            {% for curso in cursos %}
+              <div class="form-check">
+                  {% if curso in cursos_desistentes %}
+                        <input class="form-check-input" type="checkbox" value="{{ curso }}"  name="SAIR_CURSO-{{ curso }}"  checked >
+                        <label class="form-check-label" style="color: red;">
+                  {% else %}
+                        {% if curso in cursos_registrados %}
+                             <input class="form-check-input" type="checkbox" value="{{ curso }}"  name="SAIR_CURSO-{{ curso }}" >
+                             <label class="form-check-label">
+                        {% else %}
+                             <input class="form-check-input" type="checkbox" value="{{ curso }}"  name="SAIR_CURSO-{{ curso }}" disabled >
+                             <label class="form-check-label">
+                        {% endif%}
+                  {% endif%}
+                {{ curso }}
+                </label>
+              </div>
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+    <span>Documentos Recebidos:</span><br>
+
+    <div class="form-check form-check-inline">
+        {% if CPF %}
+            <input class="form-check-input" type="checkbox" value="CPF" name="CPF_CHECK" checked>
+        {% else %}
+            <input class="form-check-input" type="checkbox" value="CPF" name="CPF_CHECK">
+        {% endif %}
+        <label class="form-check-label">CPF</label>
+    </div>
+    <div class="form-check form-check-inline">
+        {% if RG %}
+            <input class="form-check-input" type="checkbox" value="RG" name="RG_CHECK" checked>
+        {% else %}
+            <input class="form-check-input" type="checkbox" value="RG" name="RG_CHECK">
+        {% endif %}
+        <label class="form-check-label">RG</label>
+    </div>
+        <div class="form-check form-check-inline">
+        {% if NIS %}
+            <input class="form-check-input" type="checkbox" value="NIS" name="NIS_CHECK" checked>
+        {% else %}
+            <input class="form-check-input" type="checkbox" value="NIS" name="NIS_CHECK">
+        {% endif %}
+        <label class="form-check-label">NIS</label>
+    </div>
+        <div class="form-check form-check-inline">
+        {% if RESIDENCIA %}
+            <input class="form-check-input" type="checkbox" value="RESIDENCIA" name="RESIDENCIA_CHECK" checked>
+        {% else %}
+            <input class="form-check-input" type="checkbox" value="RESIDENCIA" name="RESIDENCIA_CHECK">
+        {% endif %}
+        <label class="form-check-label" >Comprovante de Residência</label>
+    </div>
+        <div class="form-check form-check-inline">
+        {% if ESCOLARIDADE %}
+            <input class="form-check-input" type="checkbox" value="ESCOLARIDADE" name="ESCOLARIDADE_CHECK" checked>
+        {% else %}
+            <input class="form-check-input" type="checkbox" value="ESCOLARIDADE" name="ESCOLARIDADE_CHECK">
+        {% endif %}
+        <label class="form-check-label">Comprovantes de Escolaridade</label>
+    </div>
+
+  <hr>
+     <div class="form-row">
+            <div class="col-sm-10">
+          <label for="validationCustom31">Observações</label>
+           <textarea oninput="handleInput(event)" class="form-control" name="OBSERVACOES"
+                     id="validationCustom31" rows="3">{{ dados.OBSERVACOES }}</textarea>
+          <div class="invalid-feedback">
+            Please provide a valid zip.
+          </div>
+       </div></div>
+
+  <div class="form-group">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
+      <label class="form-check-label" for="invalidCheck">
+        Eu confirmo a veracidades destas informações
+      </label>
+      <div class="invalid-feedback">
+        Você deve confirmar a verecidade destes dados.
+      </div>
+    </div>
+  </div>
+        <center>
+      <a href="{% url 'core:home' %}" class="btn btn-success">Inicio</a>
+      <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+      <a href="{% url 'beneficiarios:busca_cestas' %}" title="" class="btn btn-warning">Buscar Beneficiários</a>
+        <input type="button" value="Voltar" class="btn btn-danger" onClick="history.go(-1)"></center>
+<br>
+</form>
+</div>
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    var validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+
+{% endfor %}
+{% endblock %}

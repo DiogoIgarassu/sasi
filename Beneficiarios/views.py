@@ -1,6 +1,5 @@
 import codecs
 import random
-
 from .models import *
 from django.shortcuts import render, redirect
 import gspread
@@ -40,6 +39,8 @@ ORDEM = ['N', 'STATUS', 'NOME', 'NASCIMENTO', 'NIS', 'CPF', 'RG', 'TELEFONE', 'E
          '1A_RENOVACAO', '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
          '10_MES', '11_MES', '12_MES', 'OBSERVACOES', 'ESCOLARIDADE', 'CURSO', 'ULTIMA_ATUALIZACAO']
 
+ORDEM_PROMOVE = ['N', 'ID_BE', 'ESCOLARIDADE', 'TELEFONE2', 'DOCUMENTOS', 'OBSERVACOES', 'ULTIMA_ATUALIZACAO']
+
 meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
          '9_MES', '10_MES', '11_MES', '12_MES']
 
@@ -50,6 +51,8 @@ mes_english = ['January', 'February', 'March', 'April', 'May', 'June', 'July', '
 
 mes_port = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO',
                'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
+
+CHECK = ['CPF_CHECK', 'RG_CHECK', 'NIS_CHECK', 'RESIDENCIA_CHECK', 'ESCOLARIDADE_CHECK']
 
 TODAY = datetime.date.today()
 MES_ATUAL = str(TODAY.strftime("%B"))
@@ -165,13 +168,16 @@ def busca_cestas(request, cpf=None):
                         dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
                         cont += 1
                         mensagem = f'Foram encontrados {cont} cadastros com nome {busca}.'
+        else:
+            tipo_busca = "Nome"
+
         if len(beneficiarios) == 0:
             mensagem = "Nenhum beneficiário encontrato."
     except:
         mensagem = "Ocorreu um erro interno, por favor entre em contato com o administrador"
 
     return render(request, 'beneficiarios/busca_cestas.html', {'beneficiarios': beneficiarios, 'mensagem': mensagem, 'unique':unique,
-                                                               'BUSCA': tipo_busca})
+                                                               'tipo_busca': tipo_busca})
 
 
 @login_required
@@ -220,7 +226,7 @@ def beneficiario_details(request, pk):
                 if key == item:
                     if key == 'ULTIMA_ATUALIZACAO':
                         updados[key] = atualizacao
-                        historico.update(f'A{novo_id}:C{novo_id}', [[str(novo_id), pks, atualizacao]])
+                        historico.update(f'A{novo_id}:C{novo_id}', [[str(novo_id), pks, 0, atualizacao]])
                     uplist.append(updados[key])
 
         sheet.update(f'{address}:AI{cell.row}', [uplist])
@@ -293,7 +299,7 @@ def beneficiario_register(request):
                 if key == item:
                     if key == 'ULTIMA_ATUALIZACAO':
                         updados[key] = atualizacao
-                        historico.update(f'A{novo_id2}:C{novo_id2}', [[str(novo_id2), novo_id, atualizacao]])
+                        historico.update(f'A{novo_id2}:C{novo_id2}', [[str(novo_id2), novo_id, 0, atualizacao]])
                     uplist.append(updados[key])
 
         sheet.update(f'A{novo_id+1}:AI{novo_id+1}', [uplist])
@@ -564,12 +570,18 @@ def relatorios(request):
     for bairro in dic_bairros:
         bairros.append(bairro)
         qtd_bairros.append(len(dic_bairros[bairro]))
-
+    if "" in bairros:
+        b_index = bairros.index("")
+        b_vazios = bairros.pop(b_index)
+        qtd_b_vazios = qtd_bairros.pop(b_index)
+        mensagem2 = f'Atenção! Existem {qtd_b_vazios} cadastros faltando colocar o bairro {b_vazios}'
+        print(mensagem2)
+    else:
+        mensagem2 =None
     origens, qtd_origens = [], []
     for origem in dic_origens:
         origens.append(origem)
         qtd_origens.append(len(dic_origens[origem]))
-
 
     context['total_2021'] = sum(qtd_mes)
     context['total_mes_anterior'] = len(dic_datas[MES_PASSADO_PT])
@@ -586,7 +598,7 @@ def relatorios(request):
 
     TOOLTIPS = [("Mês", "@x"), ("Total", "@y")]
 
-    plt = figure(x_range=meses, plot_width=800, plot_height=400, title="tipo",
+    plt = figure(x_range=meses, plot_width=800, plot_height=400,
                  toolbar_location="right", x_axis_label=x_axis,
                  y_axis_label=y_axis, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
                  tooltips=TOOLTIPS)
@@ -605,7 +617,7 @@ def relatorios(request):
 
     TOOLTIPS2 = [("Unidade SUAS", "@x"), ("Total", "@y")]
 
-    plt2 = figure(x_range=origens, plot_width=800, plot_height=400, title="tipo",
+    plt2 = figure(x_range=origens, plot_width=800, plot_height=400,
                  toolbar_location="right", x_axis_label=x_axis2,
                  y_axis_label=y_axis2, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
                  tooltips=TOOLTIPS2)
@@ -616,7 +628,7 @@ def relatorios(request):
 
     source2 = ColumnDataSource(data=dict(x=origens, y=qtd_origens, color=Category20[total_origens]))
     plt2.vbar('x', top='y', color='color', bottom=0, width=0.6, source=source2)
-    plt2.line(x=origens, y=qtd_origens, color='red', line_width=3)
+    #plt2.line(x=origens, y=qtd_origens, color='red', line_width=3)
 
     # DEFININDO AS CONFIGURAÇÕES DO GRÁFICO 3
     x_axis3 = 'Distruibuição de Cestas Básicas por Bairros em 2021.'
@@ -624,8 +636,8 @@ def relatorios(request):
 
     TOOLTIPS3 = [("Bairro", "@x"), ("Total", "@y")]
 
-    plt3 = figure(x_range=bairros, plot_width=800, plot_height=400, title="tipo",
-                  toolbar_location="right", x_axis_label=x_axis3,
+    plt3 = figure(x_range=bairros, plot_width=800, plot_height=400,
+                  toolbar_location="right", x_axis_label=x_axis3, title=mensagem2,
                   y_axis_label=y_axis3, tools="pan,wheel_zoom,box_zoom,reset, hover, tap, save",
                   tooltips=TOOLTIPS3)
 
@@ -654,7 +666,7 @@ def relatorios(request):
 
     mensagem = "Em 2021 foram entregues {0} cestas básicas " \
                ". Em {1} foram {2} Cestas, " \
-               "no mês atual foram até o momento {3} cestas.".format(context['total_2021'], MES_PASSADO_PT,
+               "no mês atual foram {3} cestas até o momento.".format(context['total_2021'], MES_PASSADO_PT,
                                                              context['total_mes_anterior'], context['total_esse_mes'])
 
     context['mensagem'] = mensagem
@@ -662,3 +674,244 @@ def relatorios(request):
 
     return render(request, template_name, context)
 
+
+@login_required
+def promove_details(request, pk):
+
+    RG, CPF, NIS, RESIDENCIA, ESCOLARIDADE = False, False, False, False, False
+    status = Status.objects.all()
+    escolaridade = Escolaridade.objects.all()
+    cursos = Curso.objects.all()
+    unidades = UnidadeSuas.objects.all()
+    esc, cur, uni, sta = [], [], [], []
+    for e in escolaridade:
+        esc.append(e.nivel)
+    for c in cursos:
+        cur.append(c.curso)
+    for u in unidades:
+        uni.append(u.unidade)
+    for s in status:
+        sta.append(s.status)
+
+    sheet = client.open('cesta_basica_emergencial').sheet1
+    promove = client.open('cesta_basica_emergencial').worksheet("Promove")
+    cursos = client.open('cesta_basica_emergencial').worksheet("Cursos")
+    cursos_desistentes = client.open('cesta_basica_emergencial').worksheet("cursos_desistentes")
+
+    pks = str(pk)
+    novo_id2 = False
+    try:
+        cell = promove.find(pks, None, in_column=2)
+        address = str(cell.address)
+        #print(cell.address, cell.row, cell.col, cell.value)
+    except:
+        values_list2 = promove.col_values(1)
+        del (values_list2[0])
+        values_list2 = list(map(int, values_list2))
+        ult_id2 = max(values_list2, key=int)
+        novo_id2 = ult_id2 + 1
+        #print(ult_id2, novo_id2)
+
+    dados = sheet.get_all_records()
+    dados_promove = promove.get_all_records()
+    dados_cursos = cursos.get_all_records()
+    dados_cursos_desistentes = cursos_desistentes.get_all_records()
+    beneficiarios, lista_promove, lista_cursos, lista_cursos_desistentes = [], [], [], []
+
+    # PREPARAÇÕES AÇÕES CURSOS
+    for lst in dados_cursos:
+        if pk == lst['ID_BE']:
+            lista_cursos.append(lst['CURSO'])
+
+    #PREPARAÇÕES AÇÕES CURSOS DESISTÊNTES
+    dic_id_desistentes = {}
+    for lst in dados_cursos_desistentes:
+        if pk == lst['ID_BE']:
+            nome_curso = lst['CURSO']
+            lista_cursos_desistentes.append(nome_curso)
+            dic_id_desistentes[nome_curso] = lst['N']
+
+     ####### MÉTODO POST ######
+    if request.method == 'POST':
+        updados = dict(request.POST.items())
+
+        #VERIFICAR SE TEM CURSOS MARCADOS
+        lista_entrar_cursos, lista_sair_cursos = [], []
+        for curso in updados:
+            if 'ENTRAR_CURSO' in str(curso):
+                lista_entrar_cursos.append(updados[curso])
+                #print('MATRICULAR', curso, updados[curso])
+            elif 'SAIR_CURSO' in str(curso):
+                lista_sair_cursos.append(updados[curso])
+                #print('DESISTENTE', curso, updados[curso])
+
+        #ENCONTRAR POSIÇÃO HISTÓRICO
+        historico = client.open('cesta_basica_emergencial').worksheet("historico")
+        values_list = historico.col_values(1)
+        del (values_list[0])
+        values_list = list(map(int, values_list))
+        ult_id = max(values_list, key=int)
+        novo_id = ult_id + 1
+
+        user = request.user
+        data1 = time.strftime('%d/%m/%Y', time.localtime())
+        hora1 = time.strftime('%H:%M:%S', time.localtime())
+        atualizacao = f'{hora1} de {data1} por {user}'
+
+        #VERIFICAR SE JÁ ESTÁ MATRICULADO
+        for curso in lista_entrar_cursos:
+            if curso not in lista_cursos:
+                values_list_cursos = cursos.col_values(1)
+                del (values_list_cursos[0])
+                values_list_cursos = list(map(int, values_list_cursos))
+                ult_id_curso = max(values_list_cursos, key=int)
+                novo_id_curso = ult_id_curso+ 1
+                cursos.update(f'A{novo_id_curso + 1}:F{novo_id_curso + 1}', [[str(novo_id_curso), pks, updados['NOME'], updados['CPF'], curso, data1]])
+
+        #VERIFICAR SE JÁ DESISTIU DO CURSO
+        for curso in lista_sair_cursos:
+            if curso not in lista_cursos_desistentes:
+                #não faz nada
+                values_list_cursos_desistente =cursos_desistentes.col_values(1)
+                del (values_list_cursos_desistente[0])
+                values_list_cursos_desistente = list(map(int, values_list_cursos_desistente))
+                ult_id_curso_desistente = max(values_list_cursos_desistente, key=int)
+                novo_id_curso_desistente = ult_id_curso_desistente + 1
+                cursos_desistentes.update(f'A{novo_id_curso_desistente + 1}:F{novo_id_curso_desistente + 1}',
+                              [[str(novo_id_curso_desistente), pks, updados['NOME'], updados['CPF'], curso, data1]])
+
+        # VERIFICAR SE VOLTOU PRO CURSO
+        for curso in lista_cursos_desistentes:
+            if curso not in lista_sair_cursos:
+                id_desiste = dic_id_desistentes[curso]
+                cursos_desistentes.update(f'A{id_desiste + 1}:F{id_desiste + 1}',
+                              [[str(id_desiste), '--', '--', '--', '--', data1]])
+
+        documentos = ""
+        for doc in CHECK:
+            if doc in updados:
+                documentos = updados[doc] + ", " + documentos
+        #print(updados)
+        uplist = []
+        for item in ORDEM_PROMOVE:
+            if item == "DOCUMENTOS":
+                updados[item] = documentos
+            if item in updados:
+                if item == 'ULTIMA_ATUALIZACAO':
+                    updados[item] = atualizacao
+                    historico.update(f'A{novo_id}:D{novo_id}', [[str(novo_id), 0, pks, atualizacao]])
+                uplist.append(updados[item])
+        if novo_id2:
+            uplist.insert(0, novo_id2)
+            #print(f'A{novo_id2+1}:G{novo_id2+1}')
+            promove.update(f'A{novo_id2+1}:G{novo_id2+1}', [uplist])
+        else:
+            promove.update(f'B{cell.row}:G{cell.row}', [uplist])
+        messages.success(request, 'Cadastro alterado com sucesso')
+        return redirect('beneficiarios:busca_cestas')
+
+    try:
+       for dic in dados:
+            if pk == dic['N']:
+                beneficiarios.append(dic)
+                dic['QTAS_CESTAS'], dic['ULT_CESTA'] = Conta_cestas(dic)
+       else:
+            mensagem = "Nenhum beneficiário encontrato."
+            messages.info(request, 'Nenhum beneficiário encontrato.')
+    except:
+        mensagem = "Dados inválidos."
+
+    # PRAPARAR AÇÕES DOCUMENTOS
+    for lst in dados_promove:
+        if pk == lst['ID_BE']:
+            beneficiarios[0]['ESCOLARIDADE'] = lst['ESCOLARIDADE']
+            beneficiarios[0]['TELEFONE2'] = lst['TELEFONE2']
+            beneficiarios[0]['DOCUMENTOS'] = lst['DOCUMENTOS']
+            beneficiarios[0]['OBSERVACOES'] = lst['OBSERVACOES']
+            beneficiarios[0]['ULTIMA_ATUALIZACAO'] = lst['ULTIMA_ATUALIZACAO']
+            if 'RG' in lst['DOCUMENTOS']:
+                RG = True
+            if 'CPF' in lst['DOCUMENTOS']:
+                CPF = True
+            if 'NIS' in lst['DOCUMENTOS']:
+                NIS = True
+            if 'RESIDENCIA' in lst['DOCUMENTOS']:
+                RESIDENCIA = True
+            if 'ESCOLARIDADE' in lst['DOCUMENTOS']:
+                ESCOLARIDADE = True
+
+    template_name = 'beneficiarios/promove_details.html'
+    context = {'beneficiario': beneficiarios, 'mensagem': mensagem, 'escolaridades': esc, 'cursos': cur, 'unidades': uni,
+               'status': sta, 'cursos_registrados': lista_cursos, 'cursos_desistentes': lista_cursos_desistentes,
+               'RG': RG, 'CPF': CPF, 'NIS': NIS, 'RESIDENCIA': RESIDENCIA, 'ESCOLARIDADE': ESCOLARIDADE}
+
+    return render(request, template_name, context)
+
+
+@login_required
+def promove_cursos(request):
+
+    status = Status.objects.all()
+    escolaridade = Escolaridade.objects.all()
+    cursos = Curso.objects.all()
+    unidades = UnidadeSuas.objects.all()
+    esc, cur, uni, sta = [], [], [], []
+    for e in escolaridade:
+        esc.append(e.nivel)
+    for c in cursos:
+        cur.append(c.curso)
+    for u in unidades:
+        uni.append(u.unidade)
+    for s in status:
+        sta.append(s.status)
+
+    sheet = client.open('cesta_basica_emergencial').sheet1
+    #pks = str(pk)
+    cell = sheet.find(pks, None, in_column=1)
+    #print(cell.address, cell.row, cell.col, cell.value)
+    address = str(cell.address)
+    #print(address)
+    dados = sheet.get_all_records()
+    beneficiarios = []
+    if request.method == 'POST':
+        historico = client.open('cesta_basica_emergencial').worksheet("historico")
+        values_list = historico.col_values(1)
+        del (values_list[0])
+        values_list = list(map(int, values_list))
+        ult_id = max(values_list, key=int)
+        novo_id = ult_id + 1
+
+        user = request.user
+        data1 = time.strftime('%d/%m/%Y', time.localtime())
+        hora1 = time.strftime('%H:%M:%S', time.localtime())
+        atualizacao = f'{hora1} de {data1} por {user}'
+
+        updados = dict(request.POST.items())
+        #print(updados)
+        uplist = []
+        for item in ORDEM:
+            for key in updados:
+                if key == item:
+                    if key == 'ULTIMA_ATUALIZACAO':
+                        updados[key] = atualizacao
+                        historico.update(f'A{novo_id}:C{novo_id}', [[str(novo_id), pks, atualizacao]])
+                    uplist.append(updados[key])
+
+        sheet.update(f'{address}:AI{cell.row}', [uplist])
+        messages.success(request, 'Cadastro alterado com sucesso')
+        return redirect('beneficiarios:busca_cestas')
+    try:
+       for dic in dados:
+            if pk == dic['N']:
+                beneficiarios.append(dic)
+       else:
+            mensagem = "Nenhum beneficiário encontrato."
+            messages.info(request, 'Nenhum beneficiário encontrato.')
+    except:
+        mensagem = "Dados inválidos."
+
+    template_name = 'beneficiarios/beneficiario_details.html'
+
+    return render(request, template_name, {'beneficiario': beneficiarios, 'mensagem': mensagem,
+                                           'escolaridades': esc, 'cursos': cur, 'unidades': uni,
+                                           'status': sta})

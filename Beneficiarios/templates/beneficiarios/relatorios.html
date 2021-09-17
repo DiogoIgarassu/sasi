@@ -40,18 +40,19 @@ body, html{
         </div>
         {% if mensagem %}
 
-        <p>{{ mensagem }}</p>
+        <h2 style="color:teal;font-weight: bold;">{{ mensagem }}</h2>
 
         {% endif %}
         <ul>
+
             <li><b>TOTAL DE REGISTROS DE SOLICITAÇÕES ANALISADAS: * {{ total_registros }} casos</b></li>
             <li><b>TOTAL DE BENEFICIÁRIOS CONTEMPLADOS EM 2021: * {{ total_ano }} Beneficiários</b></li>
-            <li>Total de Beneficiários ATIVOS:<b> {{ total_ativos }}</b></li>
-            <li>Total de Beneficiários EMERGENCIAIS:<b> {% if total_emergenciais %} {{ total_emergenciais }} {% else %} 0 {% endif %}</b></li>
-            <li>Total de Beneficiários FINALIZADOS:<b> {{ total_finalizados }}</b></li>
-            <li>Total de Beneficiários INDEFERIDOS:<b> {{ total_indeferidos }}</b></li>
-            <li>Total de Beneficiários SUSPENSOS:<b> {{ total_suspensos }}</b></li>
-            <li>Total de Beneficiários AUSENTES:<b> {% if total_ausentes %} {{ total_ausentes }} {% else %} 0 {% endif %}</b></li>
+            <li>Total de Beneficiários <span style="color:green;font-weight: bold;">ATIVOS</span>:<b> {{ total_ativos }}</b></li>
+            <li>Total de Beneficiários <span style="color:teal;font-weight: bold;">EMERGENCIAIS</span>:<b> {% if total_emergenciais %} {{ total_emergenciais }} {% else %} 0 {% endif %}</b></li>
+            <li>Total de Beneficiários <span style="color:orange;font-weight: bold;">FINALIZADOS</span>:<b> {{ total_finalizados }}</b></li>
+            <li>Total de Beneficiários <span style="color:red;font-weight: bold;">INDEFERIDOS</span>:<b> {{ total_indeferidos }}</b></li>
+            <li>Total de Beneficiários <span style="color:olive;font-weight: bold;">SUSPENSOS</span>:<b> {{ total_suspensos }}</b></li>
+            <li>Total de Beneficiários <span style="color:silver;font-weight: bold;">AUSENTES</span>:<b> {% if total_ausentes %} {{ total_ausentes }} {% else %} 0 {% endif %}</b></li>
 
         <p><b>TOTAL DE CESTAS BÁSICAS ENTREGUES EM 2021: * {{ total_2021 }} Cestas</b></p>
             <li>Total de cestas entregues no mês passado:<b> {{ total_mes_anterior }}</b></li>
@@ -127,7 +128,7 @@ body, html{
                                     {{ beneficiario.STATUS }}</td>
                             <td> {{ beneficiario.PROX_ENTREGA }}</td>
                             <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
-                            <td> {{ beneficiario.CPF }}</td>
+                            <td style="font-size: 13px;"> {{ beneficiario.CPF }}</td>
                             <td> {{ beneficiario.NIS }}</td>
                             <td> {{ beneficiario.BAIRRO }} </td>
                             <td> {{ beneficiario.ORIGEM }} </td>
