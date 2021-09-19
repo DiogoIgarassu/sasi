@@ -1,0 +1,25 @@
+
+<div class="content">
+    <h1>Igarassu Promove</h1>
+        {% for curso in cursos %}
+        <div class="list-group"  style="padding: 50px; background-color:#FFEFD5;">
+          <a href="#" class="list-group-item list-group-item-action active"
+             STYLE="font-weight: bold;background-color:black;color:white;">
+             {{ curso }}
+          </a>
+
+            {% for matriculado in matriculados %}
+                {% if curso == matriculado.CURSO %}
+
+                 <br>{{ matriculado.CONTADOR }} - {{ matriculado.CPF }} - {{ matriculado.NOME }} - {{ matriculado.DATA }}
+                {% endif %}
+
+            {% endfor %}
+            {% for desistente in desistentes %}
+                {% if curso == desistente.CURSO %}
+                <br><span style="color: red; text-decoration: line-through;"> {{ desistente.CONTADOR }} - {{ desistente.CPF }} - {{ desistente.NOME }} (Desistente)</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+</div>

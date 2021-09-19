@@ -1,18 +1,15 @@
-{% extends "core/base.html" %}
-{% load static %}
 
-{% block content %}
 
 <div class="pure-g-r content-ribbon">
 
     <div class="pure-u-1">
-
+    <center><h1>Segurança ALimentar - Benefício Eventual</h1>
     {% if mensagem %}
 
-        <br><b><p>{{ mensagem }}</p></b>
+        <br><b><h3>{{ mensagem }}</h3></b>
 
         {% endif %}
-
+    <br></center>
      {% if beneficiarios %}
     <div class="table-responsive">
         <table class="table">
@@ -21,8 +18,7 @@
                     <th>N</th>
                     <th>STATUS</th>
                     <th>DATA</th>
-                    <th>NOME</th>
-                    <th>CPF</th>
+                    <th style="width:200px;">NOME</th>
                     <th>NIS</th>
                     <th>BAIRRO</th>
                     <th>ORIGEM</th>
@@ -46,8 +42,7 @@
                     {% endif %}
                             {{ beneficiario.STATUS }}</td>
                     <td> {{ beneficiario.DATA }}</td>
-                    <td><a href="{% url 'beneficiarios:beneficiario_details' beneficiario.N %}"><i class="fa fa-eye"></i> {{ beneficiario.NOME }} </a></td>
-                    <td> {{ beneficiario.CPF }}</td>
+                    <td style="width:200px;"><b>{{ beneficiario.NOME }} </b></td>
                     <td> {{ beneficiario.NIS }}</td>
                     <td> {{ beneficiario.BAIRRO }} </td>
                     <td> {{ beneficiario.ORIGEM }} </td>
@@ -61,5 +56,3 @@
 
     </div>
 </div>
-<br><br>
-{% endblock %}

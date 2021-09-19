@@ -8,8 +8,9 @@
 
 {% for dados in beneficiario %}
 
-<h1>PROJETO IGARASSU PROMOVE</h1>
-<h4>{{ dados.NOME }}</h4></center>
+<h2>PROJETO IGARASSU PROMOVE</h2>
+<h4>{{ dados.NOME }}  <a href="{% url 'beneficiarios:beneficiario_details' dados.N %}" class="btn btn-success">
+    Segurança Alimentar</a></h4></center>
 
 <div class="container" style="background-color:#ffe6ff;">
 <form class="needs-validation" method="post" novalidate>
@@ -292,7 +293,8 @@
       <a href="{% url 'core:home' %}" class="btn btn-success">Inicio</a>
       <button type="submit" class="btn btn-primary">Salvar Alterações</button>
       <a href="{% url 'beneficiarios:busca_cestas' %}" title="" class="btn btn-warning">Buscar Beneficiários</a>
-        <input type="button" value="Voltar" class="btn btn-danger" onClick="history.go(-1)"></center>
+      <a href="{% url 'beneficiarios:promove_cursos' %}" class="btn btn-info">Lista de Cursos</a>
+      <input type="button" value="Voltar" class="btn btn-danger" onClick="history.go(-1)"></center>
 <br>
 </form>
 </div>

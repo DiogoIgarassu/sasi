@@ -45,6 +45,7 @@ meses = ['1_MES', '2_MES', '3_MES', '4_MES', '5_MES', '6_MES', '7_MES', '8_MES',
          '9_MES', '10_MES', '11_MES', '12_MES']
 
 LISTA = ['CONT', 'STATUS', 'DATA', 'NOME', 'CPF', 'NIS', 'BAIRRO', 'ORIGEM', 'QUANTAS']
+LISTA_CURSOS = ['CONTADOR', 'CPF', 'NOME', 'CURSO', 'DATA']
 
 mes_english = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September',
                'October', 'November', 'December']
@@ -63,6 +64,7 @@ lastMonth = first - datetime.timedelta(days=1)
 MES_PASSADO = str(lastMonth.strftime("%B"))
 
 lista_beneficiarios = []
+lista_matriculados, lista_desistentes, cursos_existentes = [], [], []
 mes = None
 ano = None
 mensagem_pdf = None
@@ -808,7 +810,7 @@ def promove_details(request, pk):
         else:
             promove.update(f'B{cell.row}:G{cell.row}', [uplist])
         messages.success(request, 'Cadastro alterado com sucesso')
-        return redirect('beneficiarios:busca_cestas')
+        return redirect('beneficiarios:promove_cursos')
 
     try:
        for dic in dados:
@@ -850,68 +852,84 @@ def promove_details(request, pk):
 
 @login_required
 def promove_cursos(request):
-
-    status = Status.objects.all()
-    escolaridade = Escolaridade.objects.all()
+    context = {}
+    global lista_matriculados, lista_desistentes, cursos_existentes
+    lista_matriculados, lista_desistentes, cursos_existentes = [], [], []
+    cursos_matriculados = client.open('cesta_basica_emergencial').worksheet("Cursos")
+    cursos_desistentes = client.open('cesta_basica_emergencial').worksheet("cursos_desistentes")
+    dados_cursos_matriculados = cursos_matriculados.get_all_records()
+    dados_cursos_desistentes = cursos_desistentes.get_all_records()
     cursos = Curso.objects.all()
-    unidades = UnidadeSuas.objects.all()
-    esc, cur, uni, sta = [], [], [], []
-    for e in escolaridade:
-        esc.append(e.nivel)
+
     for c in cursos:
-        cur.append(c.curso)
-    for u in unidades:
-        uni.append(u.unidade)
-    for s in status:
-        sta.append(s.status)
+        cursos_existentes.append(c.curso)
 
-    sheet = client.open('cesta_basica_emergencial').sheet1
-    #pks = str(pk)
-    cell = sheet.find(pks, None, in_column=1)
-    #print(cell.address, cell.row, cell.col, cell.value)
-    address = str(cell.address)
-    #print(address)
-    dados = sheet.get_all_records()
-    beneficiarios = []
-    if request.method == 'POST':
-        historico = client.open('cesta_basica_emergencial').worksheet("historico")
-        values_list = historico.col_values(1)
-        del (values_list[0])
-        values_list = list(map(int, values_list))
-        ult_id = max(values_list, key=int)
-        novo_id = ult_id + 1
+    dic_desistentes = {}
+    for curso in cursos_existentes:
+        cont_matriculado, cont_desistente = 0, 0
+        for lst in dados_cursos_desistentes:
+            if curso == lst['CURSO']:
+                cont_desistente += 1
+                lst['CONTADOR'] = cont_desistente
+                lista_desistentes.append(lst)
+                dic_desistentes[lst['ID_BE']] = lst['CURSO']
+        for lst in dados_cursos_matriculados:
+            if curso == lst['CURSO']:
+                if not lst['ID_BE'] in dic_desistentes or curso != dic_desistentes[lst['ID_BE']]:
+                    cont_matriculado += 1
+                    lst['CONTADOR'] = cont_matriculado
+                    lista_matriculados.append(lst)
 
-        user = request.user
-        data1 = time.strftime('%d/%m/%Y', time.localtime())
-        hora1 = time.strftime('%H:%M:%S', time.localtime())
-        atualizacao = f'{hora1} de {data1} por {user}'
+    context['cursos'] = cursos_existentes
+    context['matriculados'] = lista_matriculados
+    context['desistentes'] = lista_desistentes
 
-        updados = dict(request.POST.items())
-        #print(updados)
-        uplist = []
-        for item in ORDEM:
-            for key in updados:
-                if key == item:
-                    if key == 'ULTIMA_ATUALIZACAO':
-                        updados[key] = atualizacao
-                        historico.update(f'A{novo_id}:C{novo_id}', [[str(novo_id), pks, atualizacao]])
-                    uplist.append(updados[key])
+    template_name = 'beneficiarios/lista_cursos.html'
 
-        sheet.update(f'{address}:AI{cell.row}', [uplist])
-        messages.success(request, 'Cadastro alterado com sucesso')
-        return redirect('beneficiarios:busca_cestas')
-    try:
-       for dic in dados:
-            if pk == dic['N']:
-                beneficiarios.append(dic)
-       else:
-            mensagem = "Nenhum beneficiário encontrato."
-            messages.info(request, 'Nenhum beneficiário encontrato.')
-    except:
-        mensagem = "Dados inválidos."
+    return render(request, template_name, context)
 
-    template_name = 'beneficiarios/beneficiario_details.html'
 
-    return render(request, template_name, {'beneficiario': beneficiarios, 'mensagem': mensagem,
-                                           'escolaridades': esc, 'cursos': cur, 'unidades': uni,
-                                           'status': sta})
+def export_cursos_pdf(request):
+    template_path = 'beneficiarios/lista_cursos_pdf.html'
+    context= {}
+    context['cursos'] = cursos_existentes
+    context['matriculados'] = lista_matriculados
+    context['desistentes'] = lista_desistentes
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    file = 'Lista Igarassu Promove.pdf'
+    response['Content-Disposition'] = f'attachment; filename={file}'
+    # find the template and render it.
+    template = django.template.loader.get_template(template_path)
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+       html, dest=response, link_callback=link_callback)
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+
+def export_cursos_csv(request):
+    global lista_matriculados
+
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response.write(codecs.BOM_UTF8)
+    writer = csv.writer(response)
+    writer.writerow(LISTA_CURSOS)
+
+    for linha in lista_matriculados:
+        row_dados = []
+        for i in LISTA_CURSOS:
+            if i in linha:
+                row_dados.append(linha[i])
+
+        writer.writerow(row_dados)
+
+
+    file = 'Lista de Matriculados por curso.csv'
+    response['Content-Disposition'] = f'attachment; filename={file}'
+
+    return response

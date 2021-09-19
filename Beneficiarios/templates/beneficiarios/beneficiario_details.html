@@ -11,9 +11,9 @@
 
 {% for dados in beneficiario %}
 
-
-<h2>{{ dados.NOME }}
- <a href="{% url 'beneficiarios:promove_details' dados.N %}" class="btn btn-danger">Igarassu Promove</a></h2></center>
+<h2>SEGURANÇA ALIMENTAR</h2>
+<h4>{{ dados.NOME }}
+ <a href="{% url 'beneficiarios:promove_details' dados.N %}" class="btn btn-danger"> Igarassu Promove</a></h4></center>
 <div class="container">
 <form class="needs-validation" method="post" novalidate>
 {% csrf_token %}
@@ -336,7 +336,7 @@
         <center>
       <a href="{% url 'core:home' %}" class="btn btn-success">Inicio</a>
       <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-      <a href="{% url 'beneficiarios:busca_cestas' %}" title="" class="btn btn-warning">Buscar cestas</a>
+      <a href="{% url 'beneficiarios:busca_cestas' %}" title="" class="btn btn-warning">Buscar Beneficários</a>
       {% if not novo %}
         <a href="{% url 'beneficiarios:registrar_cesta' %}" class="btn btn-info">Adcionar Pessoa</a>
       {% endif %}
