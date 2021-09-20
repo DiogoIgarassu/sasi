@@ -1,0 +1,55 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js">
+</script>
+
+<div class="pure-g-r content-ribbon">
+
+    <div class="pure-u-1">
+        <h2>Buscador de erros</h2>
+
+            <form class="pure-form pure-form-stacked">
+                {% csrf_token %}
+             <select name="busca" style="width:250px;">
+                <option value="{{ field_buscado }}" hidden>{{ field_buscado }}</option>
+                 {% for field in fields %}
+                    <option value="{{ field }}">{{ field }}</option>
+                {% endfor %}
+             </select>
+             <a href="{% url 'beneficiarios:busca_cestas' %}"><button class="btn btn-danger" style="margin: 30px 0">Buscar erros</button></a>
+
+
+            </form>
+    {% if qtd_erros %}
+        <h4>Foram encontrados {{ qtd_erros }} em cadastros no campo {{ field_buscado }}.</h4>
+        {% endif %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>{{ field_buscado }}</th>
+                    <th>NOME</th>
+                    <th>MSG</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% for erro in lista_erros %}
+                <tr align="center" style="font-size: 15px;">
+                    <td scope="row">{{ erro.N }} </td>
+                    <td> {{ erro.FIELD }}</td>
+                    <td><a href="{% url 'beneficiarios:beneficiario_details' erro.N %}"><i class="fa fa-eye"></i> {{ erro.NOME }} </a></td>
+                    <td> {{ erro.MSG }} </td>
+            </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+    </div>
+ </div>
+</div>
+
+{% endblock %}

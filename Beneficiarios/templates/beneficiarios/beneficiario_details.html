@@ -150,32 +150,7 @@
       </div>
     </div>
   </div>
-<div class="form-row">
-    <div class="col-sm-4 sm-12">
-      <label for="validationCustom34">Escolaridade</label>
-      <select class="form-control" name="ESCOLARIDADE" id="validationCustom34">
-        <option value="{{ dados.ESCOLARIDADE }}" hidden>{{ dados.ESCOLARIDADE }}</option>
-          {% for stat in escolaridades %}
-          <option value="{{ stat }}" >{{ stat }}</option>
-          {% endfor %}
-          </select>
-      <div class="invalid-feedback">
-        Por favor informe a escolaridade.
-      </div>
-    </div>
-    <div class="col-sm-8 sm-12">
-      <label for="validationCustom35">Curso</label>
-      <select class="form-control" name="CURSO" id="validationCustom35">
-        <option value="{{ dados.CURSO }}" hidden>{{ dados.CURSO }}</option>
-          {% for stat in cursos %}
-          <option value="{{ stat }}" >{{ stat }}</option>
-          {% endfor %}
-          </select>
-      <div class="invalid-feedback">
-        Por favor informe o curso desejado.
-      </div>
-    </div>
-  </div>
+
     <hr>
 
   <div class="row justify-content-around">
@@ -310,8 +285,8 @@
           </div>
        </div>
      </div>
-     </div>
-
+   </div>
+ <hr>
         <div class="form-row">
             <div class="col-sm-10">
           <label for="validationCustom31">Observações</label>

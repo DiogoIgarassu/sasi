@@ -2,17 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f83c21b6-c845-4889-a416-586b0cc4d27d" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/lista_cursos_pdf.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/busca_erros.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/beneficiario_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/beneficiario_details.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/export_pdf.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/export_pdf.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/lista_cursos.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/lista_cursos.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/promove_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/templates/beneficiarios/promove_details.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Beneficiarios/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Beneficiarios/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Beneficiarios/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/templates/core/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/Core/templates/core/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/templates/core/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/Core/templates/core/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -322,6 +316,11 @@
           <url>file://$PROJECT_DIR$/Beneficiarios/views.py</url>
           <line>929</line>
           <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Beneficiarios/views.py</url>
+          <line>1047</line>
+          <option name="timeStamp" value="44" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

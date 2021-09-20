@@ -37,7 +37,7 @@ client = gspread.authorize(creds)
 ORDEM = ['N', 'STATUS', 'NOME', 'NASCIMENTO', 'NIS', 'CPF', 'RG', 'TELEFONE', 'ENDERECO', 'BAIRRO', 'LOCALIDADE',
          'DATA_SOLICITACAO', 'ORIGEM', 'TECNICO_RESPONSAVEL', 'PROX_ENTREGA', 'PROX_CESTA', '1_MES', '2_MES', '3_MES',
          '1A_RENOVACAO', '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
-         '10_MES', '11_MES', '12_MES', 'OBSERVACOES', 'ESCOLARIDADE', 'CURSO', 'ULTIMA_ATUALIZACAO']
+         '10_MES', '11_MES', '12_MES', 'OBSERVACOES', 'ULTIMA_ATUALIZACAO']
 
 ORDEM_PROMOVE = ['N', 'ID_BE', 'ESCOLARIDADE', 'TELEFONE2', 'DOCUMENTOS', 'OBSERVACOES', 'ULTIMA_ATUALIZACAO']
 
@@ -55,6 +55,10 @@ mes_port = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO',
 
 CHECK = ['CPF_CHECK', 'RG_CHECK', 'NIS_CHECK', 'RESIDENCIA_CHECK', 'ESCOLARIDADE_CHECK']
 
+FIELDS_ERROS = ['NIS', 'CPF', 'PROX_ENTREGA', 'PROX_CESTA', 'TODAS_DATAS', 'DATA_SOLICITACAO', '1_MES', '2_MES', '3_MES',
+         '1A_RENOVACAO', '4_MES', '5_MES', '6_MES', '2A_RENOVACAO', '7_MES', '8_MES', '9_MES', '3A_RENOVACAO',
+         '10_MES', '11_MES', '12_MES']
+
 TODAY = datetime.date.today()
 MES_ATUAL = str(TODAY.strftime("%B"))
 MES_ATUAL_INDEX = mes_english.index(MES_ATUAL)
@@ -68,6 +72,7 @@ lista_matriculados, lista_desistentes, cursos_existentes = [], [], []
 mes = None
 ano = None
 mensagem_pdf = None
+
 
 def traduzir(mes):
     if mes in mes_english:
@@ -92,6 +97,7 @@ def Conta_cestas(beneficiario):
                 ultima_data = beneficiario[key]
                 #print(mes, key, ultima_data)
     return conta, ultima_data
+
 
 @login_required
 def busca_auxlio(request):
@@ -186,14 +192,8 @@ def busca_cestas(request, cpf=None):
 def beneficiario_details(request, pk):
 
     status = Status.objects.all()
-    escolaridade = Escolaridade.objects.all()
-    cursos = Curso.objects.all()
     unidades = UnidadeSuas.objects.all()
-    esc, cur, uni, sta = [], [], [], []
-    for e in escolaridade:
-        esc.append(e.nivel)
-    for c in cursos:
-        cur.append(c.curso)
+    uni, sta = [], []
     for u in unidades:
         uni.append(u.unidade)
     for s in status:
@@ -247,22 +247,16 @@ def beneficiario_details(request, pk):
     template_name = 'beneficiarios/beneficiario_details.html'
 
     return render(request, template_name, {'beneficiario': beneficiarios, 'mensagem': mensagem,
-                                           'escolaridades': esc, 'cursos': cur, 'unidades': uni,
-                                           'status': sta})
+                                           'unidades': uni, 'status': sta})
 
 
 @login_required
 def beneficiario_register(request):
 
     status = Status.objects.all()
-    escolaridade = Escolaridade.objects.all()
-    cursos = Curso.objects.all()
     unidades = UnidadeSuas.objects.all()
-    esc, cur, uni, sta = [], [], [], []
-    for e in escolaridade:
-        esc.append(e.nivel)
-    for c in cursos:
-        cur.append(c.curso)
+    uni, sta = [], []
+
     for u in unidades:
         uni.append(u.unidade)
     for s in status:
@@ -313,12 +307,11 @@ def beneficiario_register(request):
     dic['N'] = novo_id
     beneficiarios.append(dic)
     novo_cadastro = True
-    #template_name = 'beneficiarios/beneficiario_details.html'
+
     template_name = 'beneficiarios/beneficiario_details.html'
 
     return render(request, template_name, {'beneficiario': beneficiarios, 'novo': novo_cadastro,
-                                           'escolaridades': esc, 'cursos': cur, 'unidades': uni,
-                                           'status': sta})
+                                           'unidades': uni, 'status': sta})
 
 
 @login_required
@@ -388,6 +381,7 @@ def lista_cestas(request):
     return render(request, template_name, context)
 
 
+@login_required
 def export_csv(request):
     global lista_beneficiarios, mes, ano
 
@@ -409,6 +403,7 @@ def export_csv(request):
     return response
 
 
+@login_required
 def export_pdf(request):
     template_path = 'beneficiarios/export_pdf.html'
     context = {'beneficiarios': lista_beneficiarios, 'mensagem': mensagem_pdf}
@@ -537,6 +532,7 @@ def conte_cestas():
 
     return total_registros, total_ano, dic_status, dic_datas, proxs_beneficiarios, beneficiarios_desatualizados,\
            atuais_ben_receberam, dic_bairros, dic_origens
+
 
 @login_required
 def relatorios(request):
@@ -889,6 +885,7 @@ def promove_cursos(request):
     return render(request, template_name, context)
 
 
+@login_required
 def export_cursos_pdf(request):
     template_path = 'beneficiarios/lista_cursos_pdf.html'
     context= {}
@@ -912,6 +909,7 @@ def export_cursos_pdf(request):
     return response
 
 
+@login_required
 def export_cursos_csv(request):
     global lista_matriculados
 
@@ -933,3 +931,119 @@ def export_cursos_csv(request):
     response['Content-Disposition'] = f'attachment; filename={file}'
 
     return response
+
+
+
+def busca_erros(request):
+
+    context= {}
+    lista_erros = []
+    sheet = client.open('cesta_basica_emergencial').sheet1
+    dados = sheet.get_all_records()
+    busca = request.GET.get('busca', 'CPF')
+    datas_erros = FIELDS_ERROS[5:]
+
+    for linha in dados:
+        dic_erros = {}
+        if busca in datas_erros:
+            data = linha[busca]
+            if data != '':
+                try:
+                    data = datetime.datetime.strptime(data, '%d/%m/%Y')
+                except:
+                    dic_erros['N'] = linha['N']
+                    dic_erros['NOME'] = linha['NOME']
+                    dic_erros['FIELD'] = linha[busca]
+                    dic_erros['MSG'] = 'Data errada'
+        elif busca == "TODAS_DATAS":
+            for data_erro in datas_erros:
+                data = linha[data_erro]
+                if data != '':
+                    try:
+                        data = datetime.datetime.strptime(data, '%d/%m/%Y')
+                    except:
+                        dic_erros['N'] = linha['N']
+                        dic_erros['NOME'] = linha['NOME']
+                        dic_erros['FIELD'] = linha[data_erro]
+                        dic_erros['MSG'] = f'Data errada em {data_erro}'
+        elif busca == "PROX_ENTREGA":
+            p_entrega = linha['PROX_ENTREGA'].upper()
+            p_entrega = p_entrega.split('.')
+            if len(p_entrega) > 1:
+                try:
+                    if p_entrega[0] not in mes_port or int(p_entrega[1]) < 2020 and int(p_entrega[1]) > 2021:
+                        dic_erros['N'] = linha['N']
+                        dic_erros['NOME'] = linha['NOME']
+                        dic_erros['FIELD'] = linha['PROX_ENTREGA']
+                        dic_erros['MSG'] = 'Prox Entrega errada'
+                except:
+                    dic_erros['N'] = linha['N']
+                    dic_erros['NOME'] = linha['NOME']
+                    dic_erros['FIELD'] = linha['PROX_ENTREGA']
+                    dic_erros['MSG'] = 'Prox Entrega errada'
+        elif busca == "PROX_CESTA":
+            p_cesta = linha['PROX_CESTA']
+            p_cesta = p_cesta.replace('.', '')
+            p_cesta = p_cesta.split('/')
+            if len(p_cesta) > 1:
+                try:
+                    if int(p_cesta[1]) - int(p_cesta[0]) < 0:
+                        #print(int(p_cesta[1]) - int(p_cesta[0]), 'no try')
+                        dic_erros['N'] = linha['N']
+                        dic_erros['NOME'] = linha['NOME']
+                        dic_erros['FIELD'] = linha['PROX_CESTA']
+                        dic_erros['MSG'] = 'Prox cesta errada'
+                except:
+                    #print(linha['PROX_CESTA'], p_cesta, p_cesta[1], p_cesta[1], 'no except')
+                    dic_erros['N'] = linha['N']
+                    dic_erros['NOME'] = linha['NOME']
+                    dic_erros['FIELD'] = linha['PROX_CESTA']
+                    dic_erros['MSG'] = 'Prox cesta errada'
+        elif busca == "CPF":
+            cpf = linha['CPF']
+            try:
+                cpf = str(cpf)
+                cpf = cpf.replace('.', '')
+                cpf = cpf.replace('-', '')
+                digitos_cpf = len(cpf)
+                if digitos_cpf != 11 and cpf != '':
+                    dic_erros['N'] = linha['N']
+                    dic_erros['NOME'] = linha['NOME']
+                    dic_erros['FIELD'] = linha['CPF']
+                    dic_erros['MSG'] = 'CPF ERRADO'
+                    cpf = int(cpf)
+            except:
+                #print('erro em', linha['N'])
+                dic_erros['N'] = linha['N']
+                dic_erros['NOME'] = linha['NOME']
+                dic_erros['FIELD'] = linha['CPF']
+                dic_erros['MSG'] = 'CPF ERRADO'
+
+        elif busca == "NIS":
+            try:
+                nis = linha['NIS']
+                nis = str(nis)
+                nis = nis.replace('.', '')
+                digitos_nis = len(nis)
+                if digitos_nis != 11 and nis != '':
+                    dic_erros['N'] = linha['N']
+                    dic_erros['NOME'] = linha['NOME']
+                    dic_erros['FIELD'] = linha['NIS']
+                    dic_erros['MSG'] = 'NIS ERRADO'
+                    nis = int(nis)
+            except:
+                #print('erro em', linha['N'])
+                dic_erros['N'] = linha['N']
+                dic_erros['NOME'] = linha['NOME']
+                dic_erros['FIELD'] = linha['NIS']
+                dic_erros['MSG'] = 'NIS ERRADO'
+
+        if len(dic_erros) != 0:
+            lista_erros.append(dic_erros)
+    context['fields'] = FIELDS_ERROS
+    context['field_buscado'] = busca
+    context['lista_erros'] = lista_erros
+    context['qtd_erros'] = len(lista_erros)
+    #print(context)
+    return render(request, 'beneficiarios/busca_erros.html', context)
+

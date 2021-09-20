@@ -17,5 +17,6 @@ urlpatterns = [
     path('export_pdf/', export_pdf, name='export_pdf'),
     path('export_cursos_pdf/', export_cursos_pdf, name='export_cursos_pdf'),
     path('relatorios/', relatorios, name='relatorios'),
+    path('buscar_erros', busca_erros, name='busca_erros'),
 
 ]
