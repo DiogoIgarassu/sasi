@@ -228,10 +228,10 @@ def beneficiario_details(request, pk):
                 if key == item:
                     if key == 'ULTIMA_ATUALIZACAO':
                         updados[key] = atualizacao
-                        historico.update(f'A{novo_id}:C{novo_id}', [[str(novo_id), pks, 0, atualizacao]])
+                        historico.update(f'A{novo_id}:D{novo_id}', [[str(novo_id), pks, 0, atualizacao]])
                     uplist.append(updados[key])
 
-        sheet.update(f'{address}:AI{cell.row}', [uplist])
+        sheet.update(f'{address}:AG{cell.row}', [uplist])
         messages.success(request, 'Cadastro alterado com sucesso')
         return redirect('beneficiarios:busca_cestas')
     try:
@@ -295,10 +295,10 @@ def beneficiario_register(request):
                 if key == item:
                     if key == 'ULTIMA_ATUALIZACAO':
                         updados[key] = atualizacao
-                        historico.update(f'A{novo_id2}:C{novo_id2}', [[str(novo_id2), novo_id, 0, atualizacao]])
+                        historico.update(f'A{novo_id2}:D{novo_id2}', [[str(novo_id2), novo_id, 0, atualizacao]])
                     uplist.append(updados[key])
 
-        sheet.update(f'A{novo_id+1}:AI{novo_id+1}', [uplist])
+        sheet.update(f'A{novo_id+1}:AG{novo_id+1}', [uplist])
         messages.success(request, 'Usuário cadastrado com sucesso')
         return redirect('beneficiarios:busca_cestas')
 
